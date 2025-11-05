@@ -100,7 +100,7 @@ export default function ToursPage() {
             <CardFooter className="flex items-center justify-between bg-secondary/30 p-4">
               <div className="flex flex-col">
                 <span className="text-lg font-bold">
-                  ${tour.price_per_person.toFixed(2)}
+                  ₱{tour.price_per_person.toFixed(2)}
                 </span>
                 <span className="text-xs text-muted-foreground">
                   per person

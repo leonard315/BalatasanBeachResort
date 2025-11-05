@@ -20,7 +20,7 @@ import {
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { DollarSign, Loader2, Book, Users, CreditCard } from 'lucide-react';
+import { Loader2, Book, Users, CreditCard } from 'lucide-react';
 import type { Booking } from '@/lib/types';
 import {
   Bar,
@@ -139,7 +139,7 @@ function BookingRow({ booking }: { booking: Booking }) {
         </Badge>
       </TableCell>
       <TableCell className="text-right font-medium">
-        ${booking.total_amount.toFixed(2)}
+        ₱{booking.total_amount.toFixed(2)}
       </TableCell>
     </TableRow>
   );
@@ -248,11 +248,11 @@ export default function AdminDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground">₱</span>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${stats.totalRevenue.toFixed(2)}
+              ₱{stats.totalRevenue.toFixed(2)}
             </div>
             <p className="text-xs text-muted-foreground">
               Based on confirmed bookings

@@ -18,7 +18,6 @@ import {
   Users,
   Check,
   Calendar,
-  DollarSign,
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { StarRating } from '@/components/star-rating';
@@ -142,8 +141,7 @@ export default function AccommodationDetailPage({
                   <span>Up to {accommodation.capacity} guests</span>
                 </div>
                 <div className="flex items-center gap-2 font-bold">
-                  <DollarSign className="h-5 w-5 text-primary" />
-                  <span>${accommodation.price_per_night.toFixed(2)}/night</span>
+                  <span>₱{accommodation.price_per_night.toFixed(2)}/night</span>
                 </div>
               </div>
               <Separator />

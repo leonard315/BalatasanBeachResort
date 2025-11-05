@@ -181,7 +181,7 @@ export default function BookingsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right font-medium">
-                      ${booking.total_amount.toFixed(2)}
+                      ₱{booking.total_amount.toFixed(2)}
                     </TableCell>
                   </TableRow>
                 ))}
