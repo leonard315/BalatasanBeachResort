@@ -77,7 +77,7 @@ export default function WaterSportsPage() {
                 )}
               </div>
               <Button asChild>
-                <Link href="#">Book Now</Link>
+                <Link href={`/checkout?activityId=${sport.id}`}>Book Now</Link>
               </Button>
             </CardFooter>
           </Card>
