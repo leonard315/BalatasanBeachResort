@@ -4,12 +4,16 @@ import {
   query,
   where,
   doc,
+  getDoc,
+  setDoc,
+  getFirestore,
   type CollectionReference,
   type DocumentReference,
   type Query,
   collectionGroup,
 } from 'firebase/firestore';
 import { useFirestore, useUser, useCollection, useDoc, useMemoFirebase } from '@/firebase';
+import type { User as FirebaseUser } from 'firebase/auth';
 import type {
   Accommodation,
   Tour,
@@ -18,6 +22,53 @@ import type {
   WaterSport,
   User,
 } from './types';
+
+
+// --- Data Creation/Update ---
+
+/**
+ * Creates or updates a user document in Firestore.
+ * If the user document already exists, it merges the new data.
+ * This is useful for creating a user profile on first login or after signup.
+ *
+ * @param user The Firebase Auth User object.
+ * @param additionalData Optional additional data to add to the user document.
+ */
+export async function createOrUpdateUser(user: FirebaseUser, additionalData: Partial<User> = {}) {
+    if (!user) return;
+    const firestore = getFirestore();
+    const userRef = doc(firestore, 'users', user.uid);
+    const docSnap = await getDoc(userRef);
+
+    let userData: User;
+
+    if (!docSnap.exists()) {
+        const [firstName, ...lastName] = user.displayName?.split(' ') || [additionalData.firstName || 'New', additionalData.lastName || 'User'];
+        // Special case for the admin user
+        const userType = user.email === 'admin@balatasan.com' ? 'admin' : 'guest';
+
+        userData = {
+            id: user.uid,
+            firstName: firstName,
+            lastName: lastName.join(' '),
+            email: user.email!,
+            emailVerified: user.emailVerified,
+            userType: userType,
+            isActive: true,
+            photoURL: user.photoURL || additionalData.photoURL || '',
+            ...additionalData,
+        };
+    } else {
+        // If doc exists, just merge new data
+        userData = {
+            ...docSnap.data() as User,
+            ...additionalData
+        };
+    }
+
+    await setDoc(userRef, userData, { merge: true });
+}
+
 
 // --- Data Fetching Hooks ---
 

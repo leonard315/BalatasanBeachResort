@@ -25,6 +25,7 @@ import {
   AuthError,
 } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
+import { createOrUpdateUser } from '@/lib/data';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -52,11 +53,14 @@ export default function LoginPage() {
     async function handleLogin() {
       if (state.success && state.data && auth) {
         try {
-          await signInWithEmailAndPassword(
+          const userCredential = await signInWithEmailAndPassword(
             auth,
             state.data.email,
             state.data.password
           );
+          const user = userCredential.user;
+          // Create user document if it doesn't exist
+          await createOrUpdateUser(user);
           router.push('/bookings');
         } catch (e) {
           const error = e as AuthError;
@@ -86,7 +90,9 @@ export default function LoginPage() {
     if (!auth) return;
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      // Create user document if it doesn't exist
+      await createOrUpdateUser(result.user);
       router.push('/bookings');
     } catch (error) {
       console.error('Google login failed:', error);

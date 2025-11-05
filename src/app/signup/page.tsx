@@ -21,9 +21,11 @@ import {
   signInWithPopup,
   createUserWithEmailAndPassword,
   AuthError,
+  updateProfile,
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
+import { createOrUpdateUser } from '@/lib/data';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -65,15 +67,8 @@ export default function SignupPage() {
           );
           const user = userCredential.user;
 
-          await setDoc(doc(firestore, 'users', user.uid), {
-            id: user.uid,
-            firstName,
-            lastName,
-            email,
-            emailVerified: user.emailVerified,
-            userType: 'guest',
-            isActive: true,
-          });
+          await updateProfile(user, { displayName: `${firstName} ${lastName}` });
+          await createOrUpdateUser(user, { firstName, lastName });
 
           toast({
             title: 'Success!',
@@ -111,19 +106,7 @@ export default function SignupPage() {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      
-      const [firstName, ...lastName] = user.displayName?.split(' ') || ['', ''];
-      await setDoc(doc(firestore, 'users', user.uid), {
-        id: user.uid,
-        firstName: firstName,
-        lastName: lastName.join(' '),
-        email: user.email,
-        emailVerified: user.emailVerified,
-        userType: 'guest',
-        isActive: true,
-        photoURL: user.photoURL,
-      }, { merge: true }); 
+      await createOrUpdateUser(result.user);
 
       toast({
         title: 'Success!',
