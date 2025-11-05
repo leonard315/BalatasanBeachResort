@@ -183,7 +183,7 @@ export default function CheckoutPage() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                    <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" name="name" defaultValue={user.displayName || ''} disabled />
+                    <Input id="name" name="name" defaultValue={user.displayName || ''} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
@@ -192,7 +192,6 @@ export default function CheckoutPage() {
                       name="email"
                       type="email"
                       defaultValue={user.email || ''}
-                      disabled
                     />
                   </div>
                 </div>
