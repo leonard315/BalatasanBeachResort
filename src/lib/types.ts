@@ -47,3 +47,15 @@ export interface Review {
     comment: string;
     created_at: string;
 }
+
+export interface WaterSport {
+  id: string;
+  name: string;
+  description: string;
+  capacity?: number;
+  duration: string;
+  basePrice?: number;
+  excess?: number;
+  price?: number;
+  images: string[];
+}

@@ -28,6 +28,12 @@ export function Header() {
               Tours
             </Link>
             <Link
+              href="/watersports"
+              className="transition-colors hover:text-primary"
+            >
+              Water Sports
+            </Link>
+            <Link
               href="/bookings"
               className="transition-colors hover:text-primary"
             >
@@ -63,6 +69,12 @@ export function Header() {
                   className="flex w-full items-center py-2 text-lg font-semibold"
                 >
                   Tours
+                </Link>
+                <Link
+                  href="/watersports"
+                  className="flex w-full items-center py-2 text-lg font-semibold"
+                >
+                  Water Sports
                 </Link>
                 <Link
                   href="/bookings"

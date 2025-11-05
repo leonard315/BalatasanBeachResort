@@ -1,4 +1,4 @@
-import type { Accommodation, Tour, Booking, Review } from './types';
+import type { Accommodation, Tour, Booking, Review, WaterSport } from './types';
 
 const accommodations: Accommodation[] = [
   {
@@ -149,7 +149,68 @@ const reviews: Review[] = [
         comment: 'A fantastic location right on the beach. The cottage was clean and had everything we needed. Wi-Fi was a bit spotty, but who needs it with a view like that? Would visit again.',
         created_at: '1 month ago',
     }
-]
+];
+
+const waterSports: WaterSport[] = [
+  {
+    id: 'ws-1',
+    name: 'Flying Fish',
+    description: 'A thrilling ride that sends you flying over the waves.',
+    capacity: 3,
+    duration: '15 mins',
+    basePrice: 1500,
+    excess: 500,
+    images: ['watersport-flying-fish'],
+  },
+  {
+    id: 'ws-2',
+    name: 'Banana Boat',
+    description: 'A classic and fun-filled ride for the whole family.',
+    capacity: 12,
+    duration: '15 mins',
+    basePrice: 3000,
+    excess: 250,
+    images: ['watersport-banana-boat'],
+  },
+  {
+    id: 'ws-3',
+    name: 'Hurricane',
+    description: 'Get ready to spin and scream on this exhilarating water ride.',
+    capacity: 6,
+    duration: '15 mins',
+    basePrice: 2000,
+    excess: 350,
+    images: ['watersport-hurricane'],
+  },
+  {
+    id: 'ws-4',
+    name: 'Crazy UFO',
+    description: 'An out-of-this-world ride that will have you bouncing on the water.',
+    capacity: 6,
+    duration: '15 mins',
+    basePrice: 2000,
+    excess: 350,
+    images: ['watersport-ufo'],
+  },
+  {
+    id: 'ws-5',
+    name: 'Pedal Boat',
+    description: 'A relaxing way to explore the calm waters at your own pace.',
+    capacity: 4,
+    duration: '1 hour',
+    price: 500,
+    images: ['watersport-pedal-boat'],
+  },
+  {
+    id: 'ws-6',
+    name: 'Hand Paddle Boat',
+    description: 'Perfect for a solo paddle or a fun race with a friend.',
+    duration: '1 hour',
+    price: 200,
+    images: ['watersport-hand-paddle'],
+  },
+];
+
 
 export const getAccommodations = (): Accommodation[] => accommodations;
 export const getAccommodationById = (id: string): Accommodation | undefined => accommodations.find(item => item.id === id);
@@ -160,3 +221,5 @@ export const getTourById = (id: string): Tour | undefined => tours.find(item => 
 export const getBookings = (): Booking[] => bookings;
 
 export const getReviewsByItemId = (itemId: string): Review[] => reviews.filter(review => review.item_id === itemId);
+
+export const getWaterSports = (): WaterSport[] => waterSports;
