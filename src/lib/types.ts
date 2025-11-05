@@ -38,9 +38,9 @@ export interface Booking {
   number_of_guests: number;
   total_amount: number;
   booking_status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show';
-  userId?: string;
+  userId: string;
   bookingType?: 'accommodation' | 'tour';
-  paymentStatus?: 'pending' | 'paid' | 'failed';
+  paymentStatus?: 'pending' | 'paid' | 'failed' | 'partial';
 }
 
 export interface Review {

@@ -4,9 +4,11 @@ import { moderateReview as moderateReviewFlow } from '@/ai/flows/review-moderati
 import { z } from 'zod';
 import type { ModerateReviewOutput } from '@/ai/flows/review-moderation-and-suggestions';
 import { revalidatePath } from 'next/cache';
-import { doc, setDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
 import { redirect } from 'next/navigation';
 import { initializeFirebase } from '@/firebase';
+import { auth } from 'firebase-admin';
+import { getWaterSports, getTours, getAccommodations } from '@/lib/data';
 
 const ReviewSchema = z.object({
   rating: z.coerce.number().min(1, 'Rating is required.').max(5),
@@ -73,25 +75,23 @@ export async function submitReview(
 
 const BookingSchema = z.object({
   activityId: z.string(),
-  name: z.string().min(1, 'Full Name is required.'),
-  email: z.string().email('Please enter a valid email address.'),
+  userId: z.string().min(1, 'User must be logged in.'),
   date: z.string().min(1, 'Please select a date.'),
-  paymentMethod: z
-    .string()
-    .min(1, 'Please select a payment method.'),
-  paymentOption: z.string().min(1, 'Please select a payment option.'),
+  paymentMethod: z.string().min(1, 'Please select a payment method.'),
+  guests: z.coerce.number().min(1),
 });
 
 export type BookingState = {
   errors?: {
-    name?: string[];
-    email?: string[];
+    userId?: string[];
     date?: string[];
     paymentMethod?: string[];
-    paymentOption?: string[];
+    guests?: string[];
   };
   message?: string | null;
   success?: boolean;
+  bookingId?: string;
+  paymentMethod?: string;
 };
 
 export async function processBooking(
@@ -100,11 +100,10 @@ export async function processBooking(
 ): Promise<BookingState> {
   const validatedFields = BookingSchema.safeParse({
     activityId: formData.get('activityId'),
-    name: formData.get('name'),
-    email: formData.get('email'),
+    userId: formData.get('userId'),
     date: formData.get('date'),
     paymentMethod: formData.get('paymentMethod'),
-    paymentOption: formData.get('paymentOption'),
+    guests: formData.get('guests'),
   });
 
   if (!validatedFields.success) {
@@ -114,18 +113,63 @@ export async function processBooking(
       success: false,
     };
   }
+  
+  const { firestore } = initializeFirebase();
+  const { activityId, userId, date, guests } = validatedFields.data;
 
-  // In a real app, you would process the payment with a payment gateway,
-  // save the booking to a database, and send a confirmation email.
-  // For this demo, we'll just simulate a successful booking.
-  console.log('Booking successful:', validatedFields.data);
+  const allActivities = [
+    ...getWaterSports(),
+    ...getTours(),
+    ...getAccommodations(),
+  ];
+  const activity = allActivities.find((a) => a.id === activityId);
 
-  revalidatePath('/bookings');
+  if (!activity) {
+    return { message: 'Activity not found.', success: false };
+  }
+  
+  const pricePer = (activity as any).price_per_person || (activity as any).price;
+  const basePrice = (activity as any).basePrice;
 
-  return {
-    success: true,
-    message: 'Your booking has been confirmed! You will be redirected shortly.',
-  };
+  let totalAmount = 0;
+  if(pricePer) {
+    totalAmount = pricePer * guests;
+  } else if (basePrice) {
+    const capacity = (activity as any).capacity || 0;
+    const excessGuests = Math.max(0, guests - capacity);
+    const excessCost = excessGuests * ((activity as any).excess || 0);
+    totalAmount = basePrice + excessCost;
+  }
+
+
+  try {
+    const bookingRef = await addDoc(collection(firestore, 'users', userId, 'bookings'), {
+        booking_reference: doc(collection(firestore, 'id')).id.substring(0,8).toUpperCase(),
+        item_name: (activity as any).name || (activity as any).tour_name,
+        item_image: activity.images[0],
+        check_in_date: date,
+        check_out_date: null,
+        number_of_guests: guests,
+        total_amount: totalAmount,
+        booking_status: 'pending',
+        paymentStatus: 'pending',
+        userId: userId,
+        bookingType: 'tour' // assuming all bookable things are tours for now
+    });
+
+    revalidatePath('/bookings');
+
+    return {
+        success: true,
+        message: 'Your booking has been created! Please proceed with payment.',
+        bookingId: bookingRef.id,
+        paymentMethod: validatedFields.data.paymentMethod,
+    };
+
+  } catch (error) {
+    console.error('Booking failed:', error);
+    return { message: 'Failed to create booking. Please try again.', success: false };
+  }
 }
 
 // --- AUTH ACTIONS ---
@@ -213,7 +257,8 @@ export async function signup(prevState: SignupState, formData: FormData) {
 }
 
 export async function logout() {
-  const { auth } = initializeFirebase();
-  await auth.signOut();
+  // This is a placeholder for a client-side action
+  // The actual logout is handled in the Header component which calls Firebase auth.signOut()
+  // and then uses the `action` attribute on a form to re-render the page.
   redirect('/login');
 }

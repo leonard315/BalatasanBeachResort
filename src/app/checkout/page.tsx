@@ -1,8 +1,8 @@
 'use client';
-import { useSearchParams } from 'next/navigation';
-import { useActionState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useActionState, useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { getWaterSports } from '@/lib/data';
+import { getWaterSports, getTours, getAccommodations } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -14,10 +14,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from '@/components/ui/radio-group';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import {
   CreditCard,
@@ -25,102 +22,158 @@ import {
   CircleDollarSign,
   Loader2,
   CheckCircle,
+  Users,
 } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { processBooking, type BookingState } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
+import { useUser } from '@/firebase';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending} className="w-full">
       {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      Confirm & Pay
+      Confirm & Proceed
     </Button>
   );
 }
 
 export default function CheckoutPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const activityId = searchParams.get('activityId');
-  const allActivities = getWaterSports();
+  const allActivities = [
+    ...getWaterSports(),
+    ...getTours(),
+    ...getAccommodations(),
+  ];
   const { toast } = useToast();
+  const { user, isUserLoading } = useUser();
+  const [guests, setGuests] = useState(1);
+  const [showGCashDialog, setShowGCashDialog] = useState(false);
 
   const activity = allActivities.find((a) => a.id === activityId);
 
   const initialState: BookingState = { message: null, errors: {} };
   const [state, dispatch] = useActionState(processBooking, initialState);
 
+  const pricePer = (activity as any).price_per_person || (activity as any).price;
+  const basePrice = (activity as any).basePrice;
+
+  let totalAmount = 0;
+  if(pricePer) {
+    totalAmount = pricePer * guests;
+  } else if (basePrice) {
+    const capacity = (activity as any).capacity || 0;
+    const excessGuests = Math.max(0, guests - capacity);
+    const excessCost = excessGuests * ((activity as any).excess || 0);
+    totalAmount = basePrice + excessCost;
+  }
+
+  const serviceFee = totalAmount * 0.05;
+  const total = totalAmount + serviceFee;
+
   useEffect(() => {
     if (state.success) {
-      toast({
-        title: 'Booking Confirmed!',
-        description: state.message,
-      });
-      // In a real app, you might redirect:
-      // router.push('/bookings');
-    } else if (state.message && state.errors) {
+        if(state.paymentMethod === 'gcash') {
+            setShowGCashDialog(true);
+        } else {
+             toast({
+                title: 'Booking Confirmed!',
+                description: 'Your booking is pending. You can view it in "My Bookings".',
+             });
+             router.push('/bookings');
+        }
+    } else if (state.message && (state.errors || !state.success)) {
       toast({
         variant: 'destructive',
         title: 'Booking Failed',
         description: state.message,
       });
     }
-  }, [state, toast]);
+  }, [state, toast, router]);
+
+  if (isUserLoading) {
+    return (
+      <div className="container mx-auto flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="container mx-auto py-16 text-center">
+        <h2 className="text-2xl font-semibold">Please log in</h2>
+        <p className="mt-2 text-muted-foreground">
+          You need to be logged in to make a booking.
+        </p>
+        <Button asChild className="mt-4">
+          <Link href={`/login?redirect=/checkout?activityId=${activityId}`}>Login</Link>
+        </Button>
+      </div>
+    );
+  }
 
   if (!activity) {
     return (
       <div className="container mx-auto py-8 text-center md:py-12">
         <h1 className="font-headline text-2xl font-bold">Activity not found</h1>
         <p className="text-muted-foreground">
-          The requested water sport could not be found.
+          The requested activity could not be found.
         </p>
       </div>
     );
   }
-  
-  if (state.success) {
-    return (
-        <div className="container mx-auto py-8 md:py-12">
-            <Card className="mx-auto max-w-lg">
-                <CardHeader className="items-center text-center">
-                    <CheckCircle className="h-16 w-16 text-green-500" />
-                    <CardTitle className="text-2xl">Booking Successful!</CardTitle>
-                    <CardDescription>
-                        Your booking for {activity.name} has been confirmed. You will receive an email with the details shortly.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Button asChild className="w-full">
-                        <Link href="/bookings">View My Bookings</Link>
-                    </Button>
-                </CardContent>
-            </Card>
-        </div>
-    )
-  }
-
 
   const formatPrice = (price: number) => `₱${price.toLocaleString()}`;
-  const price = activity.price ?? activity.basePrice ?? 0;
-  const serviceFee = price * 0.05;
-  const total = price + serviceFee;
 
   return (
     <div className="container mx-auto py-8 md:py-12">
+      <AlertDialog open={showGCashDialog} onOpenChange={setShowGCashDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Complete Your GCash Payment</AlertDialogTitle>
+            <AlertDialogDescription>
+              To confirm your booking, please send the total amount of{' '}
+              <span className='font-bold text-foreground'>{formatPrice(total)}</span> to the GCash number below.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className='rounded-lg border bg-secondary p-4 text-center'>
+            <p className='text-sm text-muted-foreground'>GCash Number</p>
+            <p className='text-2xl font-bold tracking-widest text-primary'>0912 345 6789</p>
+             <p className='mt-2 text-sm text-muted-foreground'>Juan Dela Cruz</p>
+          </div>
+          <p className='text-xs text-muted-foreground'>After sending, your booking status will be updated within 24 hours. Click "Done" to see your pending booking.</p>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => router.push('/bookings')}>Done</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+
       <div className="mx-auto max-w-4xl">
         <h1 className="font-headline mb-8 text-3xl font-bold tracking-tight md:text-4xl">
           Complete Your Booking
         </h1>
-        <form action={dispatch} className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <form
+          action={dispatch}
+          className="grid grid-cols-1 gap-8 md:grid-cols-3"
+        >
           <input type="hidden" name="activityId" value={activity.id} />
+          <input type="hidden" name="userId" value={user.uid} />
+          <input type="hidden" name="guests" value={guests} />
+
           <div className="space-y-8 md:col-span-2">
             <Card>
               <CardHeader>
@@ -128,14 +181,9 @@ export default function CheckoutPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
+                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" name="name" placeholder="Juan Dela Cruz" />
-                    {state.errors?.name && (
-                      <p className="text-sm font-medium text-destructive">
-                        {state.errors.name[0]}
-                      </p>
-                    )}
+                    <Input id="name" name="name" defaultValue={user.displayName || ''} disabled />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
@@ -143,23 +191,30 @@ export default function CheckoutPage() {
                       id="email"
                       name="email"
                       type="email"
-                      placeholder="juan@example.com"
+                      defaultValue={user.email || ''}
+                      disabled
                     />
-                    {state.errors?.email && (
-                      <p className="text-sm font-medium text-destructive">
-                        {state.errors.email[0]}
-                      </p>
-                    )}
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="date">Select Date</Label>
-                  <Input id="date" name="date" type="date" />
-                  {state.errors?.date && (
-                    <p className="text-sm font-medium text-destructive">
-                      {state.errors.date[0]}
-                    </p>
-                  )}
+                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                        <Label htmlFor="date">Select Date</Label>
+                        <Input id="date" name="date" type="date" />
+                        {state.errors?.date && (
+                        <p className="text-sm font-medium text-destructive">
+                            {state.errors.date[0]}
+                        </p>
+                        )}
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="guests">Number of Guests</Label>
+                        <Input id="guests" name="guests" type="number" min={1} value={guests} onChange={(e) => setGuests(parseInt(e.target.value, 10) || 1)} />
+                         {state.errors?.guests && (
+                        <p className="text-sm font-medium text-destructive">
+                            {state.errors.guests[0]}
+                        </p>
+                        )}
+                    </div>
                 </div>
               </CardContent>
             </Card>
@@ -172,21 +227,11 @@ export default function CheckoutPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <RadioGroup name="paymentMethod" className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                  <div>
-                    <RadioGroupItem
-                      value="card"
-                      id="card"
-                      className="peer sr-only"
-                    />
-                    <Label
-                      htmlFor="card"
-                      className="flex h-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                    >
-                      <CreditCard className="mb-3 h-6 w-6" />
-                      Credit/Debit
-                    </Label>
-                  </div>
+                <RadioGroup
+                  name="paymentMethod"
+                  defaultValue="gcash"
+                  className="grid grid-cols-2 gap-4 md:grid-cols-3"
+                >
                   <div>
                     <RadioGroupItem
                       value="gcash"
@@ -203,16 +248,17 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <RadioGroupItem
-                      value="paymaya"
-                      id="paymaya"
+                      value="card"
+                      id="card"
                       className="peer sr-only"
+                      disabled
                     />
                     <Label
-                      htmlFor="paymaya"
-                      className="flex h-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                      htmlFor="card"
+                      className="flex h-full cursor-not-allowed flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 opacity-50"
                     >
-                      <CircleDollarSign className="mb-3 h-6 w-6" />
-                      PayMaya
+                      <CreditCard className="mb-3 h-6 w-6" />
+                      Credit/Debit
                     </Label>
                   </div>
                   <div>
@@ -226,33 +272,16 @@ export default function CheckoutPage() {
                       className="flex h-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                     >
                       <Landmark className="mb-3 h-6 w-6" />
-                      On-site
+                      Pay On-site
                     </Label>
                   </div>
                 </RadioGroup>
-                 {state.errors?.paymentMethod && (
-                    <p className="pt-2 text-sm font-medium text-destructive">
-                      {state.errors.paymentMethod[0]}
-                    </p>
-                  )}
+                {state.errors?.paymentMethod && (
+                  <p className="pt-2 text-sm font-medium text-destructive">
+                    {state.errors.paymentMethod[0]}
+                  </p>
+                )}
               </CardContent>
-              <CardFooter className="flex-col items-start gap-4">
-                <Label>Payment Option</Label>
-                <Select name="paymentOption" defaultValue="full">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select payment option" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="full">Pay full amount</SelectItem>
-                    <SelectItem value="partial">Pay 50% downpayment</SelectItem>
-                  </SelectContent>
-                </Select>
-                 {state.errors?.paymentOption && (
-                    <p className="text-sm font-medium text-destructive">
-                      {state.errors.paymentOption[0]}
-                    </p>
-                  )}
-              </CardFooter>
             </Card>
           </div>
 
@@ -263,15 +292,18 @@ export default function CheckoutPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <p className="font-semibold">{activity.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {activity.description}
+                  <p className="font-semibold">
+                    {(activity as any).name || (activity as any).tour_name}
                   </p>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Users className="mr-2 h-4 w-4" />
+                    <span>{guests} Guest(s)</span>
+                  </div>
                 </div>
                 <Separator />
                 <div className="flex justify-between">
                   <span>Price</span>
-                  <span>{formatPrice(price)}</span>
+                  <span>{formatPrice(totalAmount)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Service Fee (5%)</span>
