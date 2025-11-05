@@ -226,6 +226,19 @@ const tours: Tour[] = [
     images: ['tour-suguicay-island'],
     rating: 4.7,
     reviews: 112
+  },
+  {
+    id: 'tour-5',
+    tour_name: 'Silad Island Exploration',
+    description: 'Discover the tranquil beauty and clear waters of Silad Island, a perfect spot for relaxation and swimming.',
+    tour_type: 'island_hopping',
+    duration_hours: 4,
+    price_per_person: 950.00,
+    max_participants: 15,
+    inclusions: ['Boat rental', 'Life jackets', 'Tour guide', 'Entrance fees'],
+    images: ['tour-silad-island'],
+    rating: 4.6,
+    reviews: 98
   }
 ];
 
