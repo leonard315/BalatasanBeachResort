@@ -46,10 +46,10 @@ export default function LoginPage() {
               </div>
               <Input id="password" type="password" required suppressHydrationWarning />
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" suppressHydrationWarning>
               Login
             </Button>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full" suppressHydrationWarning>
               Login with Google
             </Button>
           </form>

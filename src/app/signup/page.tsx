@@ -46,10 +46,10 @@ export default function SignupPage() {
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" suppressHydrationWarning />
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" suppressHydrationWarning>
               Create an account
             </Button>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full" suppressHydrationWarning>
               Sign up with Google
             </Button>
           </form>
