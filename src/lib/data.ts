@@ -213,6 +213,19 @@ const tours: Tour[] = [
     images: ['tour-buyayao-island'],
     rating: 4.9,
     reviews: 180
+  },
+  {
+    id: 'tour-4',
+    tour_name: 'Suguicay Island Getaway',
+    description: 'Relax on the long, white sandbar of Suguicay Island. A perfect spot for sunbathing, swimming, and enjoying the serene environment.',
+    tour_type: 'island_hopping',
+    duration_hours: 4,
+    price_per_person: 900.00,
+    max_participants: 20,
+    inclusions: ['Boat rental', 'Life jackets', 'Tour guide', 'Entrance fees'],
+    images: ['tour-suguicay-island'],
+    rating: 4.7,
+    reviews: 112
   }
 ];
 
