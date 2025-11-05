@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useTours } from '@/lib/data';
+import { getTours } from '@/lib/data';
 import { getPlaceholderImage } from '@/lib/utils';
 import {
   Card,
@@ -45,7 +45,7 @@ function TourSkeleton() {
 
 
 export default function ToursPage() {
-  const { data: tours, isLoading } = useTours();
+  const tours = getTours();
 
   return (
     <div className="container mx-auto py-8 md:py-12">
@@ -59,7 +59,6 @@ export default function ToursPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {isLoading && Array.from({length: 2}).map((_, i) => <TourSkeleton key={i} />)}
         {tours?.map((tour) => (
           <Card
             key={tour.id}
@@ -113,7 +112,7 @@ export default function ToursPage() {
             </CardFooter>
           </Card>
         ))}
-         {tours?.length === 0 && !isLoading && (
+         {tours?.length === 0 && (
           <div className="col-span-full py-16 text-center text-muted-foreground">
             No tours found.
           </div>

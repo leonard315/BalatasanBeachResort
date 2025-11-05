@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useAccommodations } from '@/lib/data';
+import { getAccommodations } from '@/lib/data';
 import { getPlaceholderImage } from '@/lib/utils';
 import {
   Card,
@@ -41,7 +41,7 @@ function AccommodationSkeleton() {
 }
 
 export default function AccommodationsPage() {
-  const { data: accommodations, isLoading } = useAccommodations();
+  const accommodations = getAccommodations();
 
   return (
     <div className="container mx-auto py-8 md:py-12">
@@ -56,7 +56,6 @@ export default function AccommodationsPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {isLoading && Array.from({ length: 4 }).map((_, i) => <AccommodationSkeleton key={i} />)}
         {accommodations?.map((item) => (
           <Card
             key={item.id}
@@ -111,7 +110,7 @@ export default function AccommodationsPage() {
           </Card>
         ))}
       </div>
-       {accommodations?.length === 0 && !isLoading && (
+       {accommodations?.length === 0 && (
           <div className="col-span-full py-16 text-center text-muted-foreground">
             No accommodations found.
           </div>

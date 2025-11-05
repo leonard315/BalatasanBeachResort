@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { useAccommodationById, useReviewsByItemId } from '@/lib/data';
+import { getAccommodationById, getReviewsByItemId } from '@/lib/data';
 import { getPlaceholderImage } from '@/lib/utils';
 import {
   Carousel,
@@ -75,12 +75,9 @@ export default function AccommodationDetailPage({
 }: {
   params: { id: string };
 }) {
-  const { data: accommodation, isLoading } = useAccommodationById(params.id);
-  const { data: reviews, isLoading: reviewsLoading } = useReviewsByItemId(params.id);
+  const accommodation = getAccommodationById(params.id);
+  const reviews = getReviewsByItemId(params.id);
 
-  if (isLoading) {
-    return <AccommodationDetailSkeleton />;
-  }
 
   if (!accommodation) {
     notFound();
@@ -177,12 +174,7 @@ export default function AccommodationDetailPage({
         <Separator className="my-4" />
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            {reviewsLoading ? (
-              <div className="space-y-6">
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-              </div>
-            ) : reviews && reviews.length > 0 ? (
+            {reviews && reviews.length > 0 ? (
               <div className="space-y-6">
                 {reviews.map((review) => (
                   <Card key={review.review_id}>

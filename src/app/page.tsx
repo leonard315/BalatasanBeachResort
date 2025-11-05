@@ -12,16 +12,16 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Waves, Ship, BedDouble } from 'lucide-react';
-import { useAccommodations, useTours } from '@/lib/data';
+import { getAccommodations, getTours } from '@/lib/data';
 import { getPlaceholderImage } from '@/lib/utils';
 import { StarRating } from '@/components/star-rating';
 
 export default function Home() {
-  const {data: allAccommodations} = useAccommodations();
-  const {data: allTours} = useTours();
+  const allAccommodations = getAccommodations();
+  const allTours = getTours();
 
-  const featuredAccommodations = allAccommodations?.slice(0, 3) || [];
-  const featuredTours = allTours?.slice(0, 3) || [];
+  const featuredAccommodations = allAccommodations.slice(0, 3);
+  const featuredTours = allTours.slice(0, 3);
 
   return (
     <div className="flex min-h-dvh flex-col">
