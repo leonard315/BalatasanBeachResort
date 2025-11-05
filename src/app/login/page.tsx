@@ -1,5 +1,11 @@
+'use client';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
+import { useRouter } from 'next/navigation';
+
+import { login, type LoginState } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -11,8 +17,36 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { getPlaceholderImage } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/firebase';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" className="w-full" disabled={pending}>
+      {pending && <Loader2 className="mr-2 animate-spin" />}
+      Login
+    </Button>
+  );
+}
 
 export default function LoginPage() {
+  const router = useRouter();
+  const auth = useAuth();
+  const initialState: LoginState = { message: null, errors: {} };
+  const [state, dispatch] = useActionState(login, initialState);
+
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      router.push('/bookings');
+    } catch (error) {
+      console.error('Google login failed:', error);
+    }
+  };
+
   return (
     <div className="w-full lg:grid lg:min-h-[calc(100vh-57px)] lg:grid-cols-2">
       <div className="flex items-center justify-center py-12">
@@ -23,16 +57,21 @@ export default function LoginPage() {
               Enter your email below to login to your account
             </p>
           </div>
-          <form className="grid gap-4">
+          <form action={dispatch} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="m@example.com"
                 required
-                suppressHydrationWarning
               />
+              {state?.errors?.email && (
+                <p className="text-sm font-medium text-destructive">
+                  {state.errors.email[0]}
+                </p>
+              )}
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
@@ -44,12 +83,25 @@ export default function LoginPage() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" type="password" required suppressHydrationWarning />
+              <Input id="password" name="password" type="password" required />
+              {state?.errors?.password && (
+                <p className="text-sm font-medium text-destructive">
+                  {state.errors.password[0]}
+                </p>
+              )}
             </div>
-            <Button type="submit" className="w-full" suppressHydrationWarning>
-              Login
-            </Button>
-            <Button variant="outline" className="w-full" suppressHydrationWarning>
+            {state?.message && !state.errors && (
+              <p className="text-sm font-medium text-destructive">
+                {state.message}
+              </p>
+            )}
+            <SubmitButton />
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleGoogleLogin}
+            >
               Login with Google
             </Button>
           </form>
@@ -74,3 +126,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    

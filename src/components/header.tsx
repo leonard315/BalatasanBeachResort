@@ -1,9 +1,31 @@
+'use client';
 import Link from 'next/link';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Mountain } from 'lucide-react';
+import { useUser } from '@/firebase';
+import { logout } from '@/app/actions';
 
 export function Header() {
+  const { user, isUserLoading } = useUser();
+
+  const getInitials = (name?: string | null) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('');
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center">
@@ -33,15 +55,17 @@ export function Header() {
             >
               Water Sports
             </Link>
-            <Link
-              href="/bookings"
-              className="transition-colors hover:text-primary"
-            >
-              My Bookings
-            </Link>
+            {user && (
+              <Link
+                href="/bookings"
+                className="transition-colors hover:text-primary"
+              >
+                My Bookings
+              </Link>
+            )}
           </nav>
         </div>
-        
+
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <Sheet>
             <SheetTrigger asChild>
@@ -76,41 +100,94 @@ export function Header() {
                 >
                   Water Sports
                 </Link>
-                <Link
-                  href="/bookings"
-                  className="flex w-full items-center py-2 text-lg font-semibold"
-                >
-                  My Bookings
-                </Link>
+                 {user && (
+                  <Link
+                    href="/bookings"
+                    className="flex w-full items-center py-2 text-lg font-semibold"
+                  >
+                    My Bookings
+                  </Link>
+                )}
               </div>
-               <div className="mt-auto flex flex-col gap-2">
-                <Button asChild variant="ghost">
-                    <Link href="/login">Login</Link>
-                </Button>
-                <Button asChild>
-                    <Link href="/signup">Sign Up</Link>
-                </Button>
+              <div className="mt-auto flex flex-col gap-2">
+                {!user ? (
+                  <>
+                    <Button asChild variant="ghost">
+                      <Link href="/login">Login</Link>
+                    </Button>
+                    <Button asChild>
+                      <Link href="/signup">Sign Up</Link>
+                    </Button>
+                  </>
+                ) : (
+                   <form action={logout}>
+                      <Button type="submit" variant="ghost" className="w-full justify-start">Logout</Button>
+                   </form>
+                )}
               </div>
             </SheetContent>
           </Sheet>
-           <div className="w-full flex-1 md:w-auto md:flex-none">
-             <Link href="/" className="flex items-center space-x-2 md:hidden">
-                <Mountain className="h-6 w-6 text-primary" />
-                <span className="font-bold font-headline">
-                    Balatasan Resort Hub
-                </span>
-              </Link>
+          <div className="w-full flex-1 md:w-auto md:flex-none">
+            <Link href="/" className="flex items-center space-x-2 md:hidden">
+              <Mountain className="h-6 w-6 text-primary" />
+              <span className="font-bold font-headline">
+                Balatasan Resort Hub
+              </span>
+            </Link>
           </div>
           <div className="hidden items-center space-x-2 md:flex">
-            <Button asChild variant="ghost">
-              <Link href="/login">Login</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/signup">Sign Up</Link>
-            </Button>
+            {isUserLoading ? null : !user ? (
+              <>
+                <Button asChild variant="ghost">
+                  <Link href="/login">Login</Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/signup">Sign Up</Link>
+                </Button>
+              </>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.photoURL || undefined} alt={user.displayName || 'User'} />
+                      <AvatarFallback>
+                        {getInitials(user.displayName)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {user.displayName || 'User'}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/bookings">My Bookings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <form action={logout} className="w-full">
+                    <button type="submit" className="w-full">
+                      <DropdownMenuItem className="w-full cursor-pointer">
+                        Log out
+                      </DropdownMenuItem>
+                    </button>
+                  </form>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </div>
     </header>
   );
 }
+
+    
