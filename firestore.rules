@@ -24,11 +24,11 @@ service cloud.firestore {
     }
 
     /**
-     * @description Allows authenticated users to manage their own user profile.
+     * @description Allows authenticated users to manage their own user profile. Admins can list all users.
      * @path /users/{userId}
      * @allow (create, update, delete) - User with ID 'user123' can create/update/delete their profile at /users/user123.
      * @deny (create, update, delete) - User with ID 'user456' cannot create/update/delete profile at /users/user123.
-     * @principle Enforces document ownership for writes.
+     * @principle Enforces document ownership for writes. Admins can read/list all profiles.
      */
     match /users/{userId} {
       function isExistingOwner(userId) {
