@@ -2,16 +2,40 @@ import type { Accommodation, Tour, Booking, Review, WaterSport } from './types';
 
 const accommodations: Accommodation[] = [
   {
-    id: '4',
-    name: 'Floating Cottage',
-    description: 'A unique experience on the water. This floating cottage offers stunning 360-degree views of the sea and direct water access.',
+    id: 'floating-cottage-family',
+    name: 'Family Floating Cottage',
+    description: 'Our largest floating cottage, perfect for families. Offers stunning 360-degree views of the sea and direct water access.',
     type: 'floating_cottage',
     capacity: 6,
-    price_per_night: 3500.00,
+    price_per_night: 2500.00,
     amenities: ['2 Bedrooms', 'Kitchenette', 'Sun deck', 'Direct water access', 'Fan-cooled'],
     images: ['floating-cottage-1'],
     rating: 4.7,
     reviews: 42
+  },
+   {
+    id: 'floating-cottage-standard',
+    name: 'Standard Floating Cottage',
+    description: 'A comfortable floating cottage for small groups or couples, providing a unique on-the-water experience.',
+    type: 'floating_cottage',
+    capacity: 4,
+    price_per_night: 2000.00,
+    amenities: ['1 Bedroom', 'Seating Area', 'Sun deck', 'Direct water access', 'Fan-cooled'],
+    images: ['floating-cottage-1'],
+    rating: 4.6,
+    reviews: 35
+  },
+  {
+    id: 'floating-cottage-small',
+    name: 'Small Floating Cottage',
+    description: 'An intimate floating cottage ideal for two. Enjoy the serenity of the sea in this cozy, rustic retreat.',
+    type: 'floating_cottage',
+    capacity: 2,
+    price_per_night: 1500.00,
+    amenities: ['Sleeping Area', 'Small Deck', 'Direct water access', 'Fan-cooled'],
+    images: ['floating-cottage-1'],
+    rating: 4.5,
+    reviews: 28
   },
   {
     id: '1',
