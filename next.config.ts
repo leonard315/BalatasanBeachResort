@@ -46,6 +46,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'watersportsmykonos.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
