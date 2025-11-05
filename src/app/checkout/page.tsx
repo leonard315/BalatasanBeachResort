@@ -88,7 +88,7 @@ export default function CheckoutPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <RadioGroup defaultValue="card" className="grid gap-4">
+                <RadioGroup defaultValue="card" className="grid grid-cols-2 gap-4">
                   <div>
                     <RadioGroupItem value="card" id="card" className="peer sr-only" />
                     <Label

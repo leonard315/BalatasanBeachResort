@@ -69,7 +69,7 @@ export default function WaterSportsPage() {
                     <span className="font-bold text-lg">{formatPrice(sport.price)}</span>
                 ) : (
                     <>
-                        <span className="font-bold">{formatPrice(sport.basePrice!)}</span>
+                        <span className="font-bold text-lg">{formatPrice(sport.basePrice!)}</span>
                         <span className="text-xs text-muted-foreground">
                           + {formatPrice(sport.excess!)} / extra person
                         </span>
