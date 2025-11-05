@@ -15,11 +15,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/firebase';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" className="w-full" disabled={pending}>
+    <Button
+      type="submit"
+      className="w-full"
+      disabled={pending}
+      suppressHydrationWarning
+    >
       {pending && <Loader2 className="mr-2 animate-spin" />}
       Create an account
     </Button>
@@ -28,27 +36,66 @@ function SubmitButton() {
 
 export default function SignupPage() {
   const { toast } = useToast();
-  const initialState: SignupState = { message: null, errors: {}, success: false };
+  const auth = useAuth();
+  const router = useRouter();
+
+  const initialState: SignupState = {
+    message: null,
+    errors: {},
+    success: false,
+  };
   const [state, dispatch] = useActionState(signup, initialState);
 
   useEffect(() => {
-    if (state.success) {
+    if (state.success && state.message) {
       toast({
         title: 'Success!',
-        description: 'Account created successfully!',
-      });
-    } else if (state.message && !state.success) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
         description: state.message,
       });
-    }
-  }, [state, toast]);
+      // Optionally redirect user after a short delay
+      setTimeout(() => {
+        router.push('/login');
+      }, 1000);
+    } else if (state.message && !state.success) {
+      // This handles general errors from the action
+      let description = state.message;
+      // If there are specific field errors, they are displayed below the fields.
+      // You might want to have a more generic message here.
+      if (state.errors && Object.keys(state.errors).length > 0) {
+        description =
+          'Please correct the errors below and try again.';
+      }
 
+      toast({
+        variant: 'destructive',
+        title: 'Sign Up Failed',
+        description: description,
+      });
+    }
+  }, [state, toast, router]);
+
+
+  const handleGoogleSignup = async () => {
+    if (!auth) return;
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      // You might want to create a user profile in Firestore here as well
+      // For now, just redirecting
+      router.push('/bookings');
+    } catch (error) {
+      console.error('Google signup failed:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Google Sign-up Failed',
+        description:
+          'Could not sign up with Google. Please try again.',
+      });
+    }
+  };
 
   return (
-    <div className="flex items-center justify-center py-12">
+    <div className="flex min-h-[calc(100vh-57px)] items-center justify-center py-12">
       <Card className="mx-auto max-w-sm">
         <CardHeader>
           <CardTitle className="font-headline text-2xl">Sign Up</CardTitle>
@@ -61,7 +108,13 @@ export default function SignupPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="firstName">First name</Label>
-                <Input id="firstName" name="firstName" placeholder="Max" required />
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  placeholder="Max"
+                  required
+                  suppressHydrationWarning
+                />
                 {state?.errors?.firstName && (
                   <p className="text-sm font-medium text-destructive">
                     {state.errors.firstName[0]}
@@ -70,7 +123,13 @@ export default function SignupPage() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="lastName">Last name</Label>
-                <Input id="lastName" name="lastName" placeholder="Robinson" required />
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  placeholder="Robinson"
+                  required
+                  suppressHydrationWarning
+                />
                 {state?.errors?.lastName && (
                   <p className="text-sm font-medium text-destructive">
                     {state.errors.lastName[0]}
@@ -86,6 +145,7 @@ export default function SignupPage() {
                 type="email"
                 placeholder="m@example.com"
                 required
+                suppressHydrationWarning
               />
               {state?.errors?.email && (
                 <p className="text-sm font-medium text-destructive">
@@ -95,16 +155,26 @@ export default function SignupPage() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" type="password" />
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                suppressHydrationWarning
+              />
               {state?.errors?.password && (
                 <p className="text-sm font-medium text-destructive">
                   {state.errors.password[0]}
                 </p>
               )}
             </div>
-             <div className="grid gap-2">
+            <div className="grid gap-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input id="confirmPassword" name="confirmPassword" type="password" />
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                suppressHydrationWarning
+              />
               {state?.errors?.confirmPassword && (
                 <p className="text-sm font-medium text-destructive">
                   {state.errors.confirmPassword[0]}
@@ -112,6 +182,15 @@ export default function SignupPage() {
               )}
             </div>
             <SubmitButton />
+             <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={handleGoogleSignup}
+                suppressHydrationWarning
+              >
+                Sign up with Google
+              </Button>
           </form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{' '}
@@ -124,5 +203,3 @@ export default function SignupPage() {
     </div>
   );
 }
-
-    

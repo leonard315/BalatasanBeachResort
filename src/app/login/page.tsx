@@ -24,7 +24,12 @@ import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" className="w-full" disabled={pending}>
+    <Button
+      type="submit"
+      className="w-full"
+      disabled={pending}
+      suppressHydrationWarning
+    >
       {pending && <Loader2 className="mr-2 animate-spin" />}
       Login
     </Button>
@@ -38,6 +43,7 @@ export default function LoginPage() {
   const [state, dispatch] = useActionState(login, initialState);
 
   const handleGoogleLogin = async () => {
+    if (!auth) return;
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
@@ -66,6 +72,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder="m@example.com"
                 required
+                suppressHydrationWarning
               />
               {state?.errors?.email && (
                 <p className="text-sm font-medium text-destructive">
@@ -83,7 +90,13 @@ export default function LoginPage() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" name="password" type="password" required />
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+                suppressHydrationWarning
+              />
               {state?.errors?.password && (
                 <p className="text-sm font-medium text-destructive">
                   {state.errors.password[0]}
@@ -101,6 +114,7 @@ export default function LoginPage() {
               variant="outline"
               className="w-full"
               onClick={handleGoogleLogin}
+              suppressHydrationWarning
             >
               Login with Google
             </Button>
@@ -126,5 +140,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    
