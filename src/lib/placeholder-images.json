@@ -21,19 +21,19 @@
     {
       "id": "cottage-a-3",
       "description": "View from the porch of Beachfront Cottage A.",
-      "imageUrl": "https://images.unsplash.com/photo-1557408645-ba88d51c0825?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxvY2VhbiUyMHZpZXd8ZW58MHx8fHwxNzYyMjQ0NzM4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1557408645-ba88d51c0825?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxvY2VhbiUyMHZpZXd8ZW58MHx8fHwxNzYyMjQ0NzM4fDA&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "ocean view"
     },
     {
       "id": "glamping-1",
       "description": "Exterior of a premium glamping tent.",
-      "imageUrl": "https://images.unsplash.com/photo-1632367294096-4e77d53c4ae9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxnbGFtcGluZyUyMHRlbnR8ZW58MHx8fHwxNzYyMzQ4NDYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1632367294096-4e77d53c4ae9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxnbGFtcGluZyUyMHRlbnR8ZW58MHx8fHwxNzYyMzQ4NDYzfDA&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "glamping tent"
     },
     {
       "id": "glamping-2",
       "description": "Interior of a premium glamping tent.",
-      "imageUrl": "https://images.unsplash.com/photo-1713942590283-59867d5e3f8d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx0ZW50JTIwaW50ZXJpb3J8ZW58MHx8fHwxNzYyMzQ4NDYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1713942590283-59867d5e3f8d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx0ZW50JTIwaW50ZXJpb3J8ZW58MHx8fHwxNzYyMzQ4NDYzfDA&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "tent interior"
     },
     {
@@ -45,7 +45,7 @@
     {
       "id": "villa-2",
       "description": "Living room of the Family Villa.",
-      "imageUrl": "https://images.unsplash.com/photo-1601086540476-7d9fa9dd6023?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx2aWxsYSUyMGludGVyaW9yfGVufDB8fHx8MTc2MjI0Mzc1MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1601086540476-7d9fa9dd6023?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx2aWxsYSUyMGludGVyaW9yfGVufDB8fHx8MTc2MjI0Mzc1MHww&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "villa interior"
     },
     {
@@ -63,7 +63,7 @@
     {
       "id": "island-hopping-2",
       "description": "A beautiful island visited during the tour.",
-      "imageUrl": "https://images.unsplash.com/photo-1672841828271-54340a6fbcd3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx0cm9waWNhbCUyMGlzbGFuZHxlbnwwfHx8fDE3NjIyNzgxODJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1672841828271-54340a6fbcd3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx0cm9waWNhbCUyMGlzbGFuZHxlbnwwfHx8fDE3NjIyNzgxODJ8MA&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "tropical island"
     },
     {
@@ -75,7 +75,7 @@
     {
       "id": "waterfall-2",
       "description": "People swimming at the waterfall.",
-      "imageUrl": "https://images.unsplash.com/photo-1625445069244-449b2cfe9d88?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzd2ltbWluZyUyMHdhdGVyZmFsbHxlbnwwfHx8fDE3NjIzNDg0NjR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1625445069244-449b2cfe9d88?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzd2ltbWluZyUyMHdhdGVyZmFsbHxlbnwwfHx8fDE3NjIzNDg0NjR8MA&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "swimming waterfall"
     },
     {
@@ -99,7 +99,7 @@
     {
       "id": "user-avatar-2",
       "description": "Avatar for John Smith.",
-      "imageUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxtYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjIzMzEzMTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxtYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjIzMzEzMTh8MA&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "man portrait"
     },
     {
@@ -147,7 +147,7 @@
     {
       "id": "floating-cottage-1",
       "description": "A floating cottage on the water in Balatasan.",
-      "imageUrl": "https://images.unsplash.com/photo-1615881794252-3d7653644f6a?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageUrl": "https://images.unsplash.com/photo-1615881794252-3d7653644f6a?q=80&w=1080&auto=format&fit=crop",
       "imageHint": "floating cottage"
     }
   ]
