@@ -107,7 +107,7 @@ export default function ToursPage() {
                 </span>
               </div>
               <Button asChild>
-                <Link href="#">Book Now</Link>
+                <Link href={`/checkout?activityId=${tour.id}`}>Book Now</Link>
               </Button>
             </CardFooter>
           </Card>

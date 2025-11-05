@@ -176,7 +176,7 @@ const accommodations: Accommodation[] = [
 
 const tours: Tour[] = [
   {
-    id: '1',
+    id: 'tour-1',
     tour_name: 'Aslom & Sibalat Island Hopping',
     description: 'Visit the beautiful sandbar of Aslom Island and the pristine Sibalat Island. Enjoy a freshly prepared lunch on a secluded beach.',
     tour_type: 'island_hopping',
@@ -187,6 +187,19 @@ const tours: Tour[] = [
     images: ['island-hopping-1', 'island-hopping-2'],
     rating: 4.9,
     reviews: 215
+  },
+  {
+    id: 'tour-2',
+    tour_name: 'Target Island Adventure',
+    description: 'Discover the hidden gem of Target Island, with its crystal clear waters and untouched nature. Perfect for a day of swimming and relaxation.',
+    tour_type: 'island_hopping',
+    duration_hours: 4,
+    price_per_person: 1000.00,
+    max_participants: 10,
+    inclusions: ['Boat rental', 'Life jackets', 'Tour guide', 'Light snacks'],
+    images: ['tour-target-island'],
+    rating: 4.8,
+    reviews: 150
   },
 ];
 
