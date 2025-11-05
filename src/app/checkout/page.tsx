@@ -128,7 +128,8 @@ export default function CheckoutPage() {
             description: 'Failed to save your booking. Please try again.',
           });
         }
-      } else if (!state.success && state.message) {
+      } else if (!state.success && state.message && !state.errors) {
+        // Only show toast for general errors, not validation errors
         toast({
           variant: 'destructive',
           title: 'Booking Failed',
