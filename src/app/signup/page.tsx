@@ -113,7 +113,6 @@ export default function SignupPage() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       
-      // Create user profile in Firestore
       const [firstName, ...lastName] = user.displayName?.split(' ') || ['', ''];
       await setDoc(doc(firestore, 'users', user.uid), {
         id: user.uid,
@@ -124,7 +123,7 @@ export default function SignupPage() {
         userType: 'guest',
         isActive: true,
         photoURL: user.photoURL,
-      }, { merge: true }); // Use merge to avoid overwriting data if user already exists
+      }, { merge: true }); 
 
       toast({
         title: 'Success!',
