@@ -16,11 +16,12 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Book, Users, CreditCard } from 'lucide-react';
+import { Loader2, Book, Users, CreditCard, BedDouble, ArrowRight } from 'lucide-react';
 import type { Booking } from '@/lib/types';
 import {
   Bar,
@@ -297,78 +298,102 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-7">
-        <Card className="col-span-1 lg:col-span-4">
-          <CardHeader>
-            <CardTitle>Recent Bookings</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            {bookingsLoading ? (
-              <AdminBookingsSkeleton />
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Client</TableHead>
-                    <TableHead>Item</TableHead>
-                    <TableHead>Dates</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Total</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {allBookings?.slice(0, 5).map((booking) => (
-                    <BookingRow key={booking.id} booking={booking} />
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-             {allBookings?.length === 0 && !bookingsLoading && (
-                <div className="py-16 text-center text-muted-foreground">
-                  There are no bookings yet.
-                </div>
-              )}
-          </CardContent>
-        </Card>
+       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <Card className="flex flex-col">
+              <CardHeader>
+                  <CardTitle>Content Management</CardTitle>
+                  <CardDescription>Manage accommodations, tours, and other site content.</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                 <div className="flex flex-col space-y-4">
+                    <Link href="/admin/accommodations" className="group">
+                      <div className="flex items-center justify-between rounded-lg border p-4 transition-all hover:bg-muted">
+                          <div className="flex items-center gap-4">
+                              <BedDouble className="h-6 w-6 text-primary" />
+                              <p className="font-medium">Manage Accommodations</p>
+                          </div>
+                          <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                      </div>
+                    </Link>
+                    {/* Add links for tours etc. here */}
+                 </div>
+              </CardContent>
+          </Card>
+           <Card className="col-span-1">
+            <CardHeader>
+              <CardTitle>Bookings Overview</CardTitle>
+            </CardHeader>
+            <CardContent className="pl-2">
+              <ChartContainer
+                config={{
+                  total: {
+                    label: 'Bookings',
+                    color: 'hsl(var(--primary))',
+                  },
+                }}
+                className="h-[250px] w-full"
+              >
+                <BarChart accessibilityLayer data={bookingChartData}>
+                  <XAxis
+                    dataKey="name"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tickFormatter={(value) => value.slice(0, 3)}
+                  />
+                  <YAxis
+                    stroke="#888888"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent />}
+                  />
+                  <Bar dataKey="total" fill="var(--color-total)" radius={8} />
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </div>
 
-        <Card className="col-span-1 lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Bookings Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <ChartContainer
-              config={{
-                total: {
-                  label: 'Bookings',
-                  color: 'hsl(var(--primary))',
-                },
-              }}
-              className="h-[300px] w-full"
-            >
-              <BarChart accessibilityLayer data={bookingChartData}>
-                <XAxis
-                  dataKey="name"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  tickFormatter={(value) => value.slice(0, 3)}
-                />
-                <YAxis
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent />}
-                />
-                <Bar dataKey="total" fill="var(--color-total)" radius={8} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Bookings</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          {bookingsLoading ? (
+            <AdminBookingsSkeleton />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Client</TableHead>
+                  <TableHead>Item</TableHead>
+                  <TableHead>Dates</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {allBookings?.slice(0, 5).map((booking) => (
+                  <BookingRow key={booking.id} booking={booking} />
+                ))}
+              </TableBody>
+            </Table>
+          )}
+            {allBookings?.length === 0 && !bookingsLoading && (
+              <div className="py-16 text-center text-muted-foreground">
+                There are no bookings yet.
+              </div>
+            )}
+        </CardContent>
+      </Card>
+
     </div>
   );
 }
+
+    
