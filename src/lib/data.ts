@@ -7,6 +7,7 @@ import {
   type CollectionReference,
   type DocumentReference,
   type Query,
+  collectionGroup,
 } from 'firebase/firestore';
 import { useFirestore, useUser, useCollection, useDoc, useMemoFirebase } from '@/firebase';
 import type {
@@ -64,6 +65,25 @@ export function useUserBookings() {
     );
     return useCollection<Booking>(bookingsCollection);
 }
+
+export function useAllBookings() {
+    const firestore = useFirestore();
+    const bookingsQuery = useMemoFirebase(
+        () => collectionGroup(firestore, 'bookings') as Query<Booking>,
+        [firestore]
+    );
+    return useCollection<Booking>(bookingsQuery);
+}
+
+export function useUserById(userId: string | null) {
+    const firestore = useFirestore();
+    const userDoc = useMemoFirebase(
+        () => (userId ? doc(firestore, 'users', userId) as DocumentReference<User> : null),
+        [firestore, userId]
+    );
+    return useDoc<User>(userDoc);
+}
+
 
 export function useReviewsByItemId(itemId: string | null) {
     const firestore = useFirestore();

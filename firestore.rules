@@ -19,6 +19,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == 'admin';
+    }
+
     /**
      * @description Allows authenticated users to manage their own user profile.
      * @path /users/{userId}
@@ -32,33 +36,33 @@ service cloud.firestore {
       }
 
       allow get: if request.auth != null;
-      allow list: if false; // Listing all users is not permitted.
+      allow list: if isAdmin();
       allow create: if request.auth.uid == userId;
-      allow update: if isExistingOwner(userId);
+      allow update: if isExistingOwner(userId) || isAdmin();
       allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Allows authenticated users to manage their own bookings.
+     * @description Allows authenticated users to manage their own bookings. Admins can read all bookings.
      * @path /users/{userId}/bookings/{bookingId}
      * @allow (create, update, delete) - User with ID 'user123' can create/update/delete booking with ID 'booking456' under /users/user123/bookings/booking456.
      * @deny (create, update, delete) - User with ID 'user456' cannot create/update/delete booking with ID 'booking456' under /users/user123/bookings/booking456.
-     * @principle Enforces document ownership for writes.
+     * @principle Enforces document ownership for writes, with admin read override.
      */
     match /users/{userId}/bookings/{bookingId} {
       function isExistingOwner(userId) {
         return request.auth.uid == userId && resource != null;
       }
 
-      allow get: if request.auth.uid == userId;
-      allow list: if request.auth.uid == userId;
+      allow get: if request.auth.uid == userId || isAdmin();
+      allow list: if request.auth.uid == userId || isAdmin();
       allow create: if request.auth.uid == userId;
-      allow update: if isExistingOwner(userId);
+      allow update: if isExistingOwner(userId) || isAdmin();
       allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Allows authenticated users to manage their own booking items.
+     * @description Allows authenticated users to manage their own booking items. Admins can read all items.
      * @path /users/{userId}/bookings/{bookingId}/bookingItems/{bookingItemId}
      * @allow (create, update, delete) - User with ID 'user123' can create/update/delete booking item with ID 'item789' under /users/user123/bookings/booking456/bookingItems/item789.
      * @deny (create, update, delete) - User with ID 'user456' cannot create/update/delete booking item with ID 'item789' under /users/user123/bookings/booking456/bookingItems/item789.
@@ -69,15 +73,15 @@ service cloud.firestore {
         return request.auth.uid == userId && resource != null;
       }
 
-      allow get: if request.auth.uid == userId;
-      allow list: if request.auth.uid == userId;
+      allow get: if request.auth.uid == userId || isAdmin();
+      allow list: if request.auth.uid == userId || isAdmin();
       allow create: if request.auth.uid == userId;
-      allow update: if isExistingOwner(userId);
+      allow update: if isExistingOwner(userId) || isAdmin();
       allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Allows authenticated users to manage their own payments.
+     * @description Allows authenticated users to manage their own payments. Admins can read all payments.
      * @path /users/{userId}/bookings/{bookingId}/payments/{paymentId}
      * @allow (create, update, delete) - User with ID 'user123' can create/update/delete payment with ID 'payment012' under /users/user123/bookings/booking456/payments/payment012.
      * @deny (create, update, delete) - User with ID 'user456' cannot create/update/delete payment with ID 'payment012' under /users/user123/bookings/booking456/payments/payment012.
@@ -88,15 +92,15 @@ service cloud.firestore {
         return request.auth.uid == userId && resource != null;
       }
 
-      allow get: if request.auth.uid == userId;
-      allow list: if request.auth.uid == userId;
+      allow get: if request.auth.uid == userId || isAdmin();
+      allow list: if request.auth.uid == userId || isAdmin();
       allow create: if request.auth.uid == userId;
-      allow update: if isExistingOwner(userId);
+      allow update: if isExistingOwner(userId) || isAdmin();
       allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Allows authenticated users to manage their own reviews.
+     * @description Allows authenticated users to manage their own reviews. Admins can read all reviews.
      * @path /users/{userId}/reviews/{reviewId}
      * @allow (create, update, delete) - User with ID 'user123' can create/update/delete review with ID 'review345' under /users/user123/reviews/review345.
      * @deny (create, update, delete) - User with ID 'user456' cannot create/update/delete review with ID 'review345' under /users/user123/reviews/review345.
@@ -107,8 +111,8 @@ service cloud.firestore {
         return request.auth.uid == userId && resource != null;
       }
 
-      allow get: if request.auth.uid == userId;
-      allow list: if request.auth.uid == userId;
+      allow get: if request.auth.uid == userId || isAdmin();
+      allow list: if request.auth.uid == userId || isAdmin();
       allow create: if request.auth.uid == userId;
       allow update: if isExistingOwner(userId);
       allow delete: if isExistingOwner(userId);
@@ -124,7 +128,7 @@ service cloud.firestore {
     match /accommodations/{accommodationId} {
       allow get: if true;
       allow list: if true;
-      allow create, update, delete: if false; // TODO: Add admin validation once roles are defined.
+      allow create, update, delete: if isAdmin();
     }
 
     /**
@@ -137,7 +141,7 @@ service cloud.firestore {
     match /tourPackages/{tourPackageId} {
       allow get: if true;
       allow list: if true;
-      allow create, update, delete: if false; // TODO: Add admin validation once roles are defined.
+      allow create, update, delete: if isAdmin();
     }
 
     /**
@@ -150,7 +154,7 @@ service cloud.firestore {
     match /availabilityCalendar/{availabilityCalendarId} {
       allow get: if true;
       allow list: if true;
-      allow create, update, delete: if false; // TODO: Add admin validation once roles are defined.
+      allow create, update, delete: if isAdmin();
     }
 
     /**
@@ -163,7 +167,7 @@ service cloud.firestore {
     match /promoCodes/{promoCodeId} {
       allow get: if true;
       allow list: if true;
-      allow create, update, delete: if false; // TODO: Add admin validation once roles are defined.
+      allow create, update, delete: if isAdmin();
     }
 
     /**
@@ -176,7 +180,7 @@ service cloud.firestore {
     match /activityLogs/{activityLogId} {
       allow get: if true;
       allow list: if true;
-      allow create, update, delete: if false; // TODO: Add admin validation once roles are defined.
+      allow create, update, delete: if isAdmin();
     }
   }
 }

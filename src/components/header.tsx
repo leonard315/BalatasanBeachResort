@@ -13,10 +13,14 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Mountain } from 'lucide-react';
 import { useUser } from '@/firebase';
+import { useUserById } from '@/lib/data';
 import { logout } from '@/app/actions';
 
 export function Header() {
   const { user, isUserLoading } = useUser();
+  const { data: userProfile } = useUserById(user?.uid || null);
+
+  const isAdmin = userProfile?.userType === 'admin';
 
   const getInitials = (name?: string | null) => {
     if (!name) return 'U';
@@ -63,6 +67,14 @@ export function Header() {
                 My Bookings
               </Link>
             )}
+             {isAdmin && (
+              <Link
+                href="/admin"
+                className="font-semibold text-primary transition-colors hover:text-primary/80"
+              >
+                Admin
+              </Link>
+            )}
           </nav>
         </div>
 
@@ -106,6 +118,14 @@ export function Header() {
                     className="flex w-full items-center py-2 text-lg font-semibold"
                   >
                     My Bookings
+                  </Link>
+                )}
+                 {isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="flex w-full items-center py-2 text-lg font-semibold text-primary"
+                  >
+                    Admin
                   </Link>
                 )}
               </div>
@@ -172,6 +192,11 @@ export function Header() {
                   <DropdownMenuItem asChild>
                     <Link href="/bookings">My Bookings</Link>
                   </DropdownMenuItem>
+                   {isAdmin && (
+                    <DropdownMenuItem asChild>
+                        <Link href="/admin">Admin Dashboard</Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <form action={logout} className="w-full">
                     <button type="submit" className="w-full">
@@ -189,5 +214,3 @@ export function Header() {
     </header>
   );
 }
-
-    
