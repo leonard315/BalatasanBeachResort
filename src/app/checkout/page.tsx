@@ -26,7 +26,7 @@ import {
 import { processBooking, type BookingState } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
-import { useUser, useFirestore } from '@/firebase';
+import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,16 +52,17 @@ export default function CheckoutPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const activityId = searchParams.get('activityId');
-  const allActivities = [
-    ...getWaterSports(),
-    ...getTours(),
-    ...getAccommodations(),
-  ];
   const { toast } = useToast();
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
   const [guests, setGuests] = useState(1);
   const [showGCashDialog, setShowGCashDialog] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('gcash');
+
+  const allActivities = useMemoFirebase(
+    () => [...getWaterSports(), ...getTours(), ...getAccommodations()],
+    []
+  );
 
   const activity = allActivities.find((a) => a.id === activityId);
 
@@ -69,17 +70,19 @@ export default function CheckoutPage() {
   const [state, dispatch] = useActionState(processBooking, initialState);
 
   const pricePer =
-    (activity as any).price_per_person || (activity as any).price;
-  const basePrice = (activity as any).basePrice;
+    (activity as any)?.price_per_person || (activity as any)?.price;
+  const basePrice = (activity as any)?.basePrice;
 
   let totalAmount = 0;
-  if (pricePer) {
-    totalAmount = pricePer * guests;
-  } else if (basePrice) {
-    const capacity = (activity as any).capacity || 0;
-    const excessGuests = Math.max(0, guests - capacity);
-    const excessCost = excessGuests * ((activity as any).excess || 0);
-    totalAmount = basePrice + excessCost;
+  if (activity) {
+    if (pricePer) {
+      totalAmount = pricePer * guests;
+    } else if (basePrice) {
+      const capacity = (activity as any).capacity || 0;
+      const excessGuests = Math.max(0, guests - capacity);
+      const excessCost = excessGuests * ((activity as any).excess || 0);
+      totalAmount = basePrice + excessCost;
+    }
   }
 
   const serviceFee = totalAmount * 0.05;
@@ -90,26 +93,24 @@ export default function CheckoutPage() {
       if (state.success && state.data && user && firestore) {
         // Validation was successful on the server, now create booking on client
         try {
-          await addDoc(
-            collection(firestore, 'users', user.uid, 'bookings'),
-            {
-              booking_reference: doc(collection(firestore, 'id'))
-                .id.substring(0, 8)
-                .toUpperCase(),
-              item_name: (activity as any).name || (activity as any).tour_name,
-              item_image: activity!.images[0],
-              check_in_date: state.data.date,
-              check_out_date: null,
-              number_of_guests: state.data.guests,
-              total_amount: total,
-              booking_status: 'pending',
-              paymentStatus: 'pending',
-              userId: user.uid,
-              bookingType: 'tour', // assuming all bookable things are tours for now
-            }
-          );
+          await addDoc(collection(firestore, 'users', user.uid, 'bookings'), {
+            booking_reference: doc(
+              collection(firestore, 'id')
+            ).id.substring(0, 8).toUpperCase(),
+            item_name:
+              (activity as any)?.name || (activity as any)?.tour_name,
+            item_image: activity!.images[0],
+            check_in_date: state.data.date,
+            check_out_date: null,
+            number_of_guests: state.data.guests,
+            total_amount: total,
+            booking_status: 'pending',
+            paymentStatus: 'pending',
+            userId: user.uid,
+            bookingType: 'tour', // assuming all bookable things are tours for now
+          });
 
-          if (state.paymentMethod === 'gcash') {
+          if (state.data.paymentMethod === 'gcash') {
             setShowGCashDialog(true);
           } else {
             toast({
@@ -192,7 +193,7 @@ export default function CheckoutPage() {
           <div className="rounded-lg border bg-secondary p-4 text-center">
             <p className="text-sm text-muted-foreground">GCash Number</p>
             <p className="text-2xl font-bold tracking-widest text-primary">
-              0912 345 6789
+              {state.data?.gCashNumber || '0912 345 6789'}
             </p>
             <p className="mt-2 text-sm text-muted-foreground">Juan Dela Cruz</p>
           </div>
@@ -233,11 +234,11 @@ export default function CheckoutPage() {
                       name="name"
                       defaultValue={user.displayName || ''}
                     />
-                     {state.errors?.name && (
-                        <p className="text-sm font-medium text-destructive">
-                            {state.errors.name[0]}
-                        </p>
-                        )}
+                    {state.errors?.name && (
+                      <p className="text-sm font-medium text-destructive">
+                        {state.errors.name[0]}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
@@ -247,11 +248,11 @@ export default function CheckoutPage() {
                       type="email"
                       defaultValue={user.email || ''}
                     />
-                     {state.errors?.email && (
-                        <p className="text-sm font-medium text-destructive">
-                            {state.errors.email[0]}
-                        </p>
-                        )}
+                    {state.errors?.email && (
+                      <p className="text-sm font-medium text-destructive">
+                        {state.errors.email[0]}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -283,6 +284,22 @@ export default function CheckoutPage() {
                     )}
                   </div>
                 </div>
+                {paymentMethod === 'gcash' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="gCashNumber">GCash Number</Label>
+                    <Input
+                      id="gCashNumber"
+                      name="gCashNumber"
+                      type="text"
+                      placeholder="e.g. 09123456789"
+                    />
+                    {state.errors?.gCashNumber && (
+                      <p className="text-sm font-medium text-destructive">
+                        {state.errors.gCashNumber[0]}
+                      </p>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -296,7 +313,8 @@ export default function CheckoutPage() {
               <CardContent>
                 <RadioGroup
                   name="paymentMethod"
-                  defaultValue="gcash"
+                  value={paymentMethod}
+                  onValueChange={setPaymentMethod}
                   className="grid grid-cols-2 gap-4 md:grid-cols-3"
                 >
                   <div>

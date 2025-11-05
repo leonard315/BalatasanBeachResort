@@ -5,7 +5,6 @@ import { z } from 'zod';
 import type { ModerateReviewOutput } from '@/ai/flows/review-moderation-and-suggestions';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { getWaterSports, getTours, getAccommodations } from '@/lib/data';
 
 const ReviewSchema = z.object({
   rating: z.coerce.number().min(1, 'Rating is required.').max(5),
@@ -78,6 +77,15 @@ const BookingSchema = z.object({
   guests: z.coerce.number().min(1),
   name: z.string().min(1, 'Full name is required.'),
   email: z.string().email('Invalid email address.'),
+  gCashNumber: z.string().optional(),
+}).refine(data => {
+    if (data.paymentMethod === 'gcash') {
+        return data.gCashNumber && data.gCashNumber.length > 0;
+    }
+    return true;
+}, {
+    message: 'GCash number is required for this payment method.',
+    path: ['gCashNumber'],
 });
 
 export type BookingState = {
@@ -85,7 +93,6 @@ export type BookingState = {
   message?: string | null;
   success?: boolean;
   data?: z.infer<typeof BookingSchema> | null;
-  paymentMethod?: string;
 };
 
 export async function processBooking(
@@ -100,6 +107,7 @@ export async function processBooking(
     guests: formData.get('guests'),
     name: formData.get('name'),
     email: formData.get('email'),
+    gCashNumber: formData.get('gCashNumber'),
   });
 
   if (!validatedFields.success) {
@@ -115,7 +123,6 @@ export async function processBooking(
     success: true,
     message: 'Validation successful. Proceeding with booking...',
     data: validatedFields.data,
-    paymentMethod: validatedFields.data.paymentMethod,
   };
 }
 
