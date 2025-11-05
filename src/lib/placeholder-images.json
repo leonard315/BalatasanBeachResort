@@ -27,13 +27,13 @@
     {
       "id": "glamping-1",
       "description": "Exterior of a premium glamping tent.",
-      "imageUrl": "https://images.unsplash.com/photo-1632367294096-4e77d53c4ae9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxnbGFtcGluZyUyMHRlbnR8ZW58MHx8fHwxNzYyMzQ4NDYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1632367294096-4e77d53c4ae9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxnbGFtcGluZyUyMHRlbnR8ZW58MHx8fHwxNzYyMzQ4NDYzfDA&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "glamping tent"
     },
     {
       "id": "glamping-2",
       "description": "Interior of a premium glamping tent.",
-      "imageUrl": "https://images.unsplash.com/photo-1713942590283-59867d5e3f8d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx0ZW50JTIwaW50ZXJpb3J8ZW58MHx8fHwxNzYyMzQ4NDYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1713942590283-59867d5e3f8d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx0ZW50JTIwaW50ZXJpb3J8ZW58MHx8fHwxNzYyMzQ4NDYzfDA&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "tent interior"
     },
     {
@@ -45,7 +45,7 @@
     {
       "id": "villa-2",
       "description": "Living room of the Family Villa.",
-      "imageUrl": "https://images.unsplash.com/photo-1601086540476-7d9fa9dd6023?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx2aWxsYSUyMGludGVyaW9yfGVufDB8fHx8MTc2MjI0Mzc1MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1601086540476-7d9fa9dd6023?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx2aWxsYSUyMGludGVyaW9yfGVufDB8fHx8MTc2MjI0Mzc1MHww&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "villa interior"
     },
     {
@@ -57,7 +57,7 @@
     {
       "id": "island-hopping-1",
       "description": "A boat during an island hopping tour.",
-      "imageUrl": "https://images.unsplash.com/photo-1669608996939-f80730062a2e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHx0b3VyJTIwYm9hdHxlbnwwfHx8fDE3NjIyNzMyNTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1669608996939-f80730062a2e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHx0b3VyJTIwYm9hdHxlbnwwfHx8fDE3NjIyNzMyNTN8MA&ixlib-rb-4.1.0&q=80&w=1080",
       "imageHint": "tour boat"
     },
     {
@@ -147,7 +147,7 @@
     {
       "id": "floating-cottage-1",
       "description": "A floating cottage on the water in Balatasan.",
-      "imageUrl": "https://images.unsplash.com/photo-1615880226259-a708185689e4?q=80&w=1080&auto=format&fit=crop",
+      "imageUrl": "https://i.ibb.co/P5K38G6/floating-cottage-philippines.jpg",
       "imageHint": "floating cottage"
     }
   ]
