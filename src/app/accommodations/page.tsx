@@ -65,7 +65,7 @@ export default function AccommodationsPage() {
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex items-center justify-between bg-secondary/30 p-4">
+            <CardFooter className="flex flex-col items-stretch gap-2 bg-secondary/30 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex flex-col">
                 <span className="font-bold text-lg">₱{item.price_per_night.toFixed(2)}</span>
                 <span className="text-xs text-muted-foreground">

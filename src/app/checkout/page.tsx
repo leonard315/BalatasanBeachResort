@@ -57,13 +57,13 @@ export default function CheckoutPage() {
           Complete Your Booking
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 space-y-8">
             <Card>
               <CardHeader>
                 <CardTitle>Booking Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                 <div className="grid grid-cols-2 gap-4">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
                     <Input id="name" placeholder="Juan Dela Cruz" />
@@ -80,7 +80,7 @@ export default function CheckoutPage() {
               </CardContent>
             </Card>
 
-            <Card className="mt-8">
+            <Card>
               <CardHeader>
                 <CardTitle>Payment Method</CardTitle>
                 <CardDescription>
@@ -159,7 +159,7 @@ export default function CheckoutPage() {
           </div>
 
           <div className="md:col-span-1">
-            <Card>
+            <Card className='sticky top-20'>
               <CardHeader>
                 <CardTitle>Summary</CardTitle>
               </CardHeader>

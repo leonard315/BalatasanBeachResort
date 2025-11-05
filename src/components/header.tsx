@@ -83,8 +83,24 @@ export function Header() {
                   My Bookings
                 </Link>
               </div>
+               <div className="mt-auto flex flex-col gap-2">
+                <Button asChild variant="ghost">
+                    <Link href="/login">Login</Link>
+                </Button>
+                <Button asChild>
+                    <Link href="/signup">Sign Up</Link>
+                </Button>
+              </div>
             </SheetContent>
           </Sheet>
+           <div className="w-full flex-1 md:w-auto md:flex-none">
+             <Link href="/" className="flex items-center space-x-2 md:hidden">
+                <Mountain className="h-6 w-6 text-primary" />
+                <span className="font-bold font-headline">
+                    Balatasan Resort Hub
+                </span>
+              </Link>
+          </div>
           <div className="hidden items-center space-x-2 md:flex">
             <Button asChild variant="ghost">
               <Link href="/login">Login</Link>
