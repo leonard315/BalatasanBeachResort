@@ -155,6 +155,12 @@
       "description": "A beautiful view of Target Island.",
       "imageUrl": "https://travelorientalmindoro.ph/Content/img/uploads/33b63d38-739b-4b7f-b8c4-ca744970c5cf.jpg",
       "imageHint": "tropical island beach"
+    },
+    {
+      "id": "tour-buyayao-island",
+      "description": "A beautiful view of Buyayao Island.",
+      "imageUrl": "https://cdns.app/wgsdkw2F/assets/image/properties/957686ebaf49d88b1bc9e4a53e8a2540_1656589352.jpg",
+      "imageHint": "tropical island cliff"
     }
   ]
 }

@@ -201,6 +201,19 @@ const tours: Tour[] = [
     rating: 4.8,
     reviews: 150
   },
+  {
+    id: 'tour-3',
+    tour_name: 'Buyayao Island Marine Sanctuary',
+    description: 'Explore the rich marine biodiversity of Buyayao Island. A must-visit for snorkelers and nature lovers alike.',
+    tour_type: 'snorkeling',
+    duration_hours: 6,
+    price_per_person: 1500.00,
+    max_participants: 12,
+    inclusions: ['Boat rental', 'Life jackets', 'Snorkeling gear', 'Sanctuary fees', 'Tour guide'],
+    images: ['tour-buyayao-island'],
+    rating: 4.9,
+    reviews: 180
+  }
 ];
 
 const bookings: Booking[] = [];
