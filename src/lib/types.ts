@@ -2,7 +2,7 @@ export interface Accommodation {
   id: string;
   name: string;
   description: string;
-  type: 'cottage' | 'glamping_tent' | 'villa' | 'room';
+  type: 'cottage' | 'glamping_tent' | 'villa' | 'room' | 'floating_cottage';
   capacity: number;
   price_per_night: number;
   amenities: string[];

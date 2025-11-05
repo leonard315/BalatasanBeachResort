@@ -36,6 +36,18 @@ const accommodations: Accommodation[] = [
     images: ['villa-1', 'villa-2', 'villa-3'],
     rating: 4.9,
     reviews: 78
+  },
+  {
+    id: '4',
+    name: 'Floating Cottage',
+    description: 'A unique experience on the water. This floating cottage offers stunning 360-degree views of the sea.',
+    type: 'floating_cottage',
+    capacity: 6,
+    price_per_night: 3500.00,
+    amenities: ['2 Bedrooms', 'Kitchenette', 'Sun deck', 'Direct water access'],
+    images: ['floating-cottage-1'],
+    rating: 4.7,
+    reviews: 42
   }
 ];
 
