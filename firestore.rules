@@ -119,6 +119,16 @@ service cloud.firestore {
     }
 
     /**
+     * @description Allows admins to perform collection group queries on all bookings.
+     * @path /users/{userId}/bookings/{bookingId}
+     * @allow (list) - An admin can list all bookings across all users.
+     * @principle Enables admin-level data aggregation.
+     */
+    match /{path=**}/bookings/{bookingId} {
+      allow list: if isAdmin();
+    }
+
+    /**
      * @description Allows anyone to read accommodation information.
      * @path /accommodations/{accommodationId}
      * @allow (get, list) - Any user can read accommodation information.
