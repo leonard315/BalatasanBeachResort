@@ -57,7 +57,7 @@ const accommodations: Accommodation[] = [
     capacity: 4,
     price_per_night: 1500.00,
     amenities: ['Electric Fan', 'Shared bathroom', 'Outdoor seating'],
-    images: ['glamping-1'],
+    images: ['cottage-a-1'],
     rating: 4.2,
     reviews: 85
   },
