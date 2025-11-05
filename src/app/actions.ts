@@ -4,15 +4,9 @@ import { moderateReview as moderateReviewFlow } from '@/ai/flows/review-moderati
 import { z } from 'zod';
 import type { ModerateReviewOutput } from '@/ai/flows/review-moderation-and-suggestions';
 import { revalidatePath } from 'next/cache';
-import {
-  AuthError,
-  createUserWithEmailAndPassword,
-  getAuth,
-  signInWithEmailAndPassword,
-} from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
 import { redirect } from 'next/navigation';
+import { initializeFirebase } from '@/firebase';
 
 const ReviewSchema = z.object({
   rating: z.coerce.number().min(1, 'Rating is required.').max(5),
@@ -147,6 +141,8 @@ export type LoginState = {
     password?: string[];
   };
   message?: string | null;
+  data?: z.infer<typeof LoginSchema> | null;
+  success?: boolean;
 };
 
 export async function login(prevState: LoginState, formData: FormData) {
@@ -157,21 +153,15 @@ export async function login(prevState: LoginState, formData: FormData) {
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Invalid credentials.',
+      message: 'Invalid fields.',
+      success: false,
     };
   }
 
-  const { email, password } = validatedFields.data;
-  const { auth } = initializeFirebase();
-
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (e) {
-    const error = e as AuthError;
-    return { message: error.message };
-  }
-
-  return redirect('/bookings');
+  return {
+    success: true,
+    data: validatedFields.data,
+  };
 }
 
 const SignupSchema = z
@@ -199,6 +189,7 @@ export type SignupState = {
   };
   message?: string | null;
   success?: boolean;
+  data?: z.infer<typeof SignupSchema> | null;
 };
 
 export async function signup(prevState: SignupState, formData: FormData) {
@@ -214,42 +205,11 @@ export async function signup(prevState: SignupState, formData: FormData) {
     };
   }
 
-  const { email, password, firstName, lastName } = validatedFields.data;
-  const { auth, firestore } = initializeFirebase();
-
-  try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    const user = userCredential.user;
-
-    // Create user document in Firestore
-    await setDoc(doc(firestore, 'users', user.uid), {
-      id: user.uid,
-      firstName,
-      lastName,
-      email,
-      emailVerified: user.emailVerified,
-      userType: 'guest',
-      isActive: true,
-    });
-
-    return { success: true, message: 'Account created successfully!' };
-  } catch (e) {
-    const error = e as AuthError;
-    let message = 'An unknown error occurred.';
-    if (error.code === 'auth/email-already-in-use') {
-      message = 'This email address is already in use.';
-      return {
-        errors: { email: [message] },
-        message: 'Account creation failed.',
-        success: false,
-      };
-    }
-    return { success: false, message: error.message };
-  }
+  return {
+    success: true,
+    message: 'Validation successful. Proceeding with account creation...',
+    data: validatedFields.data,
+  };
 }
 
 export async function logout() {
@@ -257,5 +217,3 @@ export async function logout() {
   await auth.signOut();
   redirect('/login');
 }
-
-    

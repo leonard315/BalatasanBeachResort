@@ -15,8 +15,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-import { useAuth } from '@/firebase';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { useAuth, useFirestore } from '@/firebase';
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+  AuthError,
+} from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
 function SubmitButton() {
@@ -37,6 +43,7 @@ function SubmitButton() {
 export default function SignupPage() {
   const { toast } = useToast();
   const auth = useAuth();
+  const firestore = useFirestore();
   const router = useRouter();
 
   const initialState: SignupState = {
@@ -47,33 +54,57 @@ export default function SignupPage() {
   const [state, dispatch] = useActionState(signup, initialState);
 
   useEffect(() => {
-    if (state.success && state.message) {
-      toast({
-        title: 'Success!',
-        description: state.message,
-      });
-      // Optionally redirect user after a short delay
-      setTimeout(() => {
-        router.push('/login');
-      }, 1000);
-    } else if (state.message && !state.success) {
-      // This handles general errors from the action
-      let description = state.message;
-      // If there are specific field errors, they are displayed below the fields.
-      // You might want to have a more generic message here.
-      if (state.errors && Object.keys(state.errors).length > 0) {
-        description =
-          'Please correct the errors below and try again.';
+    async function handleSignup() {
+      if (state.success && state.data && auth && firestore) {
+        const { email, password, firstName, lastName } = state.data;
+        try {
+          const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
+          const user = userCredential.user;
+
+          await setDoc(doc(firestore, 'users', user.uid), {
+            id: user.uid,
+            firstName,
+            lastName,
+            email,
+            emailVerified: user.emailVerified,
+            userType: 'guest',
+            isActive: true,
+          });
+
+          toast({
+            title: 'Success!',
+            description: 'Account created successfully!',
+          });
+
+          setTimeout(() => {
+            router.push('/login');
+          }, 1000);
+        } catch (e) {
+          const error = e as AuthError;
+          let message = 'An unknown error occurred.';
+          if (error.code === 'auth/email-already-in-use') {
+            message = 'This email address is already in use.';
+          }
+          toast({
+            variant: 'destructive',
+            title: 'Sign Up Failed',
+            description: message,
+          });
+        }
+      } else if (!state.success && state.message) {
+        toast({
+          variant: 'destructive',
+          title: 'Sign Up Failed',
+          description: state.message,
+        });
       }
-
-      toast({
-        variant: 'destructive',
-        title: 'Sign Up Failed',
-        description: description,
-      });
     }
-  }, [state, toast, router]);
-
+    handleSignup();
+  }, [state, auth, firestore, toast, router]);
 
   const handleGoogleSignup = async () => {
     if (!auth) return;
@@ -182,15 +213,15 @@ export default function SignupPage() {
               )}
             </div>
             <SubmitButton />
-             <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                onClick={handleGoogleSignup}
-                suppressHydrationWarning
-              >
-                Sign up with Google
-              </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleGoogleSignup}
+              suppressHydrationWarning
+            >
+              Sign up with Google
+            </Button>
           </form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{' '}

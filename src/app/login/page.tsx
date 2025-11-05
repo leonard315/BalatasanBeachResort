@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
 
@@ -9,7 +9,6 @@ import { login, type LoginState } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -19,7 +18,13 @@ import { Label } from '@/components/ui/label';
 import { getPlaceholderImage } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/firebase';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  AuthError,
+} from 'firebase/auth';
+import { useToast } from '@/hooks/use-toast';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -39,8 +44,38 @@ function SubmitButton() {
 export default function LoginPage() {
   const router = useRouter();
   const auth = useAuth();
+  const { toast } = useToast();
   const initialState: LoginState = { message: null, errors: {} };
   const [state, dispatch] = useActionState(login, initialState);
+
+  useEffect(() => {
+    async function handleLogin() {
+      if (state.success && state.data && auth) {
+        try {
+          await signInWithEmailAndPassword(
+            auth,
+            state.data.email,
+            state.data.password
+          );
+          router.push('/bookings');
+        } catch (e) {
+          const error = e as AuthError;
+          toast({
+            variant: 'destructive',
+            title: 'Login Failed',
+            description: error.message,
+          });
+        }
+      } else if (!state.success && state.message) {
+        toast({
+          variant: 'destructive',
+          title: 'Login Failed',
+          description: state.message,
+        });
+      }
+    }
+    handleLogin();
+  }, [state, auth, router, toast]);
 
   const handleGoogleLogin = async () => {
     if (!auth) return;
@@ -50,6 +85,12 @@ export default function LoginPage() {
       router.push('/bookings');
     } catch (error) {
       console.error('Google login failed:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Google Login Failed',
+        description:
+          'Could not sign in with Google. Please try again.',
+      });
     }
   };
 
@@ -103,7 +144,7 @@ export default function LoginPage() {
                 </p>
               )}
             </div>
-            {state?.message && !state.errors && (
+            {state?.message && !state.success && (
               <p className="text-sm font-medium text-destructive">
                 {state.message}
               </p>
