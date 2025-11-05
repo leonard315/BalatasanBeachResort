@@ -1,7 +1,7 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
-import { useEffect, useState } from 'react';
+import { useFormStatus } from 'react-dom';
+import { useActionState, useEffect, useState } from 'react';
 import { submitReview, type ReviewState } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -29,7 +29,7 @@ function SubmitButton() {
 
 export function ReviewForm({ itemId, itemType }: ReviewFormProps) {
   const initialState: ReviewState = { message: null, errors: {} };
-  const [state, dispatch] = useFormState(submitReview, initialState);
+  const [state, dispatch] = useActionState(submitReview, initialState);
   const [rating, setRating] = useState(0);
   const { toast } = useToast();
 
