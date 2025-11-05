@@ -23,7 +23,7 @@ export default function LoginPage() {
               Enter your email below to login to your account
             </p>
           </div>
-          <form className="grid gap-4" suppressHydrationWarning>
+          <form className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -31,6 +31,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder="m@example.com"
                 required
+                suppressHydrationWarning
               />
             </div>
             <div className="grid gap-2">
@@ -43,7 +44,7 @@ export default function LoginPage() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" type="password" required />
+              <Input id="password" type="password" required suppressHydrationWarning />
             </div>
             <Button type="submit" className="w-full">
               Login
