@@ -25,7 +25,7 @@ export default function AccommodationsPage() {
           Our Accommodations
         </h1>
         <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
-          Find the perfect retreat for your getaway. We offer a variety of stays to suit your needs.
+          From our famous floating cottages to beachfront stays, find the perfect retreat for your getaway.
         </p>
       </div>
 
@@ -49,7 +49,7 @@ export default function AccommodationsPage() {
                 <CardTitle className="font-headline text-xl mb-2">
                   {item.name}
                 </CardTitle>
-                <Badge variant="secondary">{item.type}</Badge>
+                <Badge variant="secondary">{item.type.replace('_', ' ')}</Badge>
               </div>
               <CardDescription className="h-12 overflow-hidden text-ellipsis text-sm">
                 {item.description}
@@ -67,7 +67,7 @@ export default function AccommodationsPage() {
             </CardContent>
             <CardFooter className="flex items-center justify-between bg-secondary/30 p-4">
               <div className="flex flex-col">
-                <span className="font-bold text-lg">${item.price_per_night.toFixed(2)}</span>
+                <span className="font-bold text-lg">₱{item.price_per_night.toFixed(2)}</span>
                 <span className="text-xs text-muted-foreground">
                   per night
                 </span>

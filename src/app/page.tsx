@@ -36,7 +36,7 @@ export default function Home() {
             Your Seaside Sanctuary Awaits
           </h1>
           <p className="mt-4 max-w-2xl text-lg md:text-xl">
-            Discover the pristine beauty of Balatasan Beach Resort. Unwind,
+            Discover the pristine beauty of Balatasan Resort in Bulalacao. Unwind,
             explore, and create unforgettable memories.
           </p>
           <Button asChild size="lg" className="mt-8">
@@ -55,8 +55,8 @@ export default function Home() {
                 Escape to Paradise
               </h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                We offer a unique blend of comfort, adventure, and tranquility.
-                Whether you&apos;re looking for a relaxing getaway or an
+                We are famous for our unique floating cottages and serve as a perfect jump-off point for island hopping adventures.
+                Whether you're looking for a relaxing getaway or an
                 action-packed holiday, we have something for everyone.
               </p>
             </div>
@@ -64,25 +64,23 @@ export default function Home() {
           <div className="mx-auto grid max-w-5xl items-start gap-8 py-12 sm:grid-cols-2 md:gap-12 lg:grid-cols-3">
             <div className="grid gap-1 text-center">
               <BedDouble className="mx-auto h-10 w-10 text-primary" />
-              <h3 className="text-lg font-bold">Comfortable Stays</h3>
+              <h3 className="text-lg font-bold">Unique Stays</h3>
               <p className="text-sm text-muted-foreground">
-                From cozy cottages to luxurious villas, find your perfect home
-                away from home.
+                Experience our famous floating cottages or relax in our beachfront rooms.
               </p>
             </div>
             <div className="grid gap-1 text-center">
               <Ship className="mx-auto h-10 w-10 text-primary" />
-              <h3 className="text-lg font-bold">Exciting Adventures</h3>
+              <h3 className="text-lg font-bold">Island Hopping</h3>
               <p className="text-sm text-muted-foreground">
-                Explore vibrant marine life and stunning islands with our guided
-                tours.
+                Explore the stunning beauty of nearby Aslom and Sibalat islands with our guided tours.
               </p>
             </div>
             <div className="grid gap-1 text-center">
               <Waves className="mx-auto h-10 w-10 text-primary" />
-              <h3 className="text-lg font-bold">Pristine Beaches</h3>
+              <h3 className="text-lg font-bold">Water Sports</h3>
               <p className="text-sm text-muted-foreground">
-                Relax on our white sandy beaches and soak up the tropical sun.
+                Relax on our white sandy beaches and enjoy activities like kayaking and paddle boating.
               </p>
             </div>
           </div>
@@ -131,7 +129,7 @@ export default function Home() {
                 <CardFooter className="flex justify-between p-4 pt-0">
                   <div className="flex flex-col">
                     <span className="font-semibold">
-                      ${item.price_per_night.toFixed(2)}
+                      ₱{item.price_per_night.toFixed(2)}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       per night
@@ -197,7 +195,7 @@ export default function Home() {
                 <CardFooter className="flex justify-between p-4 pt-0">
                    <div className="flex flex-col">
                     <span className="font-semibold">
-                      ${tour.price_per_person.toFixed(2)}
+                      ₱{tour.price_per_person.toFixed(2)}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       per person

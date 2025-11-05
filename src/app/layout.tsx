@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Balatasan Resort Hub',
-  description: 'Your Seaside Sanctuary Awaits',
+  description: 'Experience the charm of Bulalacao, Oriental Mindoro. Famous for our floating cottages and serene beachfront, Balatasan Resort is your perfect seaside sanctuary.',
 };
 
 export default function RootLayout({
