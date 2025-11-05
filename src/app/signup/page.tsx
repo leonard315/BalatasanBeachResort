@@ -77,7 +77,7 @@ export default function SignupPage() {
 
           toast({
             title: 'Success!',
-            description: 'Account created successfully!',
+            description: 'Successfully Created',
           });
 
           setTimeout(() => {
@@ -107,20 +107,36 @@ export default function SignupPage() {
   }, [state, auth, firestore, toast, router]);
 
   const handleGoogleSignup = async () => {
-    if (!auth) return;
+    if (!auth || !firestore) return;
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      // You might want to create a user profile in Firestore here as well
-      // For now, just redirecting
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      
+      // Create user profile in Firestore
+      const [firstName, ...lastName] = user.displayName?.split(' ') || ['', ''];
+      await setDoc(doc(firestore, 'users', user.uid), {
+        id: user.uid,
+        firstName: firstName,
+        lastName: lastName.join(' '),
+        email: user.email,
+        emailVerified: user.emailVerified,
+        userType: 'guest',
+        isActive: true,
+        photoURL: user.photoURL,
+      }, { merge: true }); // Use merge to avoid overwriting data if user already exists
+
+      toast({
+        title: 'Success!',
+        description: 'Account created successfully with Google!',
+      });
       router.push('/bookings');
     } catch (error) {
       console.error('Google signup failed:', error);
       toast({
         variant: 'destructive',
         title: 'Google Sign-up Failed',
-        description:
-          'Could not sign up with Google. Please try again.',
+        description: 'Could not sign up with Google. Please try again.',
       });
     }
   };

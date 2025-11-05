@@ -60,10 +60,15 @@ export default function LoginPage() {
           router.push('/bookings');
         } catch (e) {
           const error = e as AuthError;
+          let description = error.message;
+          if (error.code === 'auth/invalid-credential') {
+            description =
+              'The email or password you entered is incorrect. Please check your credentials and try again.';
+          }
           toast({
             variant: 'destructive',
             title: 'Login Failed',
-            description: error.message,
+            description,
           });
         }
       } else if (!state.success && state.message) {

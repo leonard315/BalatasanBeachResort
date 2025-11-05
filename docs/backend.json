@@ -39,6 +39,10 @@
         "emailVerified": {
           "type": "boolean",
           "description": "Indicates whether the user's email address has been verified."
+        },
+        "photoURL": {
+            "type": "string",
+            "description": "The URL of the user's profile picture."
         }
       },
       "required": [
@@ -747,4 +751,3 @@
     "reasoning": "The Firestore data structure is designed to ensure security, scalability, and ease of debugging, adhering to the core design principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are not Filters). It focuses on path-based ownership and segregation of concerns. \n\nAuthorization Independence is achieved primarily through path-based ownership for user-specific data and denormalization where needed. User profiles and their associated bookings are stored under `/users/{userId}`, eliminating the need for `get()` calls in security rules to validate ownership. Access to bookings is directly controlled by the user's ID in the path. Collaborative data, if any, would use membership maps stored within the relevant documents, avoiding hierarchical dependencies.\n\nQAPs (Rules are not Filters) is supported via structural segregation. Publicly accessible data (if any) would be stored in separate collections with specific rules, while private user data is kept under the `/users/{userId}` hierarchy. This prevents the need to filter data based on access rights within a single collection, simplifying list operations and preventing unintended data exposure.\n\nThis structure facilitates simple, robust, and debuggable security rules. It's easy to reason about access control because it is based on the document path and the authenticated user's ID, reducing complexity and potential security vulnerabilities."
   }
 }
-    
