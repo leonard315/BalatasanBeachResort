@@ -88,6 +88,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.bestsuppliers.com',
+        port: '',
+        pathname: '/**',
+      }
     ],
   },
 };
