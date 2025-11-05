@@ -1,3 +1,4 @@
+'use client';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -11,16 +12,19 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Waves, Ship, BedDouble } from 'lucide-react';
-import { getAccommodations, getTours } from '@/lib/data';
+import { useAccommodations, useTours } from '@/lib/data';
 import { getPlaceholderImage } from '@/lib/utils';
 import { StarRating } from '@/components/star-rating';
 
 export default function Home() {
-  const featuredAccommodations = getAccommodations().slice(0, 3);
-  const featuredTours = getTours().slice(0, 3);
+  const {data: allAccommodations} = useAccommodations();
+  const {data: allTours} = useTours();
+
+  const featuredAccommodations = allAccommodations?.slice(0, 3) || [];
+  const featuredTours = allTours?.slice(0, 3) || [];
 
   return (
-    <div className="flex flex-col min-h-dvh">
+    <div className="flex min-h-dvh flex-col">
       <section className="relative h-[60vh] min-h-[400px] w-full">
         <Image
           src={getPlaceholderImage('hero-background').imageUrl}
@@ -188,8 +192,8 @@ export default function Home() {
                     {tour.tour_name}
                   </CardTitle>
                    <div className="mt-2 flex items-center">
-                    <StarRating rating={tour.rating} />
-                    <span className="ml-2 text-sm text-muted-foreground">({tour.reviews} reviews)</span>
+                    <StarRating rating={tour.rating || 0} />
+                    <span className="ml-2 text-sm text-muted-foreground">({tour.reviews || 0} reviews)</span>
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between p-4 pt-0">

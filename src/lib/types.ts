@@ -9,6 +9,7 @@ export interface Accommodation {
   images: string[];
   rating: number;
   reviews: number;
+  isAvailable?: boolean;
 }
 
 export interface Tour {
@@ -19,14 +20,16 @@ export interface Tour {
   duration_hours: number;
   price_per_person: number;
   max_participants: number;
+  minParticipants?: number;
   inclusions: string[];
   images: string[];
-  rating: number;
-  reviews: number;
+  rating?: number;
+  reviews?: number;
+  isActive?: boolean;
 }
 
 export interface Booking {
-  booking_id: string;
+  id: string;
   booking_reference: string;
   item_name: string;
   item_image: string;
@@ -35,6 +38,9 @@ export interface Booking {
   number_of_guests: number;
   total_amount: number;
   booking_status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show';
+  userId?: string;
+  bookingType?: 'accommodation' | 'tour';
+  paymentStatus?: 'pending' | 'paid' | 'failed';
 }
 
 export interface Review {
@@ -46,6 +52,8 @@ export interface Review {
     title: string;
     comment: string;
     created_at: string;
+    userId?: string;
+    isApproved?: boolean;
 }
 
 export interface WaterSport {
@@ -58,4 +66,16 @@ export interface WaterSport {
   excess?: number;
   price?: number;
   images: string[];
+}
+
+export interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  userType: 'guest' | 'staff' | 'admin';
+  isActive: boolean;
+  emailVerified: boolean;
+  photoURL?: string;
 }

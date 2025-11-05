@@ -1,6 +1,7 @@
+'use client';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getAccommodationById, getReviewsByItemId } from '@/lib/data';
+import { useAccommodationById, useReviewsByItemId } from '@/lib/data';
 import { getPlaceholderImage } from '@/lib/utils';
 import {
   Carousel,
@@ -16,7 +17,6 @@ import {
   BedDouble,
   Users,
   Check,
-  Star,
   Calendar,
   DollarSign,
 } from 'lucide-react';
@@ -24,21 +24,70 @@ import { Separator } from '@/components/ui/separator';
 import { StarRating } from '@/components/star-rating';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ReviewForm } from '@/components/review-form';
+import { Skeleton } from '@/components/ui/skeleton';
+
+function AccommodationDetailSkeleton() {
+  return (
+    <div className="container mx-auto py-8 md:py-12">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-5">
+        <div className="md:col-span-3">
+          <Skeleton className="aspect-video w-full rounded-lg" />
+        </div>
+        <div className="md:col-span-2">
+          <Card>
+            <CardHeader>
+              <Skeleton className="mb-2 h-6 w-24" />
+              <Skeleton className="h-9 w-3/4" />
+              <div className="flex items-center gap-2 pt-2">
+                <Skeleton className="h-5 w-28" />
+                <Skeleton className="h-5 w-16" />
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Skeleton className="h-20 w-full" />
+              <Separator />
+              <div className="grid grid-cols-2 gap-4">
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+              </div>
+              <Separator />
+              <div>
+                <Skeleton className="mb-2 h-6 w-32" />
+                <ul className="grid grid-cols-2 gap-2">
+                  <Skeleton className="h-5 w-full" />
+                  <Skeleton className="h-5 w-full" />
+                  <Skeleton className="h-5 w-full" />
+                  <Skeleton className="h-5 w-full" />
+                </ul>
+              </div>
+              <Skeleton className="h-12 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AccommodationDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
-  const accommodation = getAccommodationById(params.id);
-  const reviews = getReviewsByItemId(params.id);
+  const { data: accommodation, isLoading } = useAccommodationById(params.id);
+  const { data: reviews, isLoading: reviewsLoading } = useReviewsByItemId(params.id);
+
+  if (isLoading) {
+    return <AccommodationDetailSkeleton />;
+  }
 
   if (!accommodation) {
     notFound();
   }
 
   const averageRating =
-    reviews.length > 0
+    reviews && reviews.length > 0
       ? reviews.reduce((acc, review) => acc + review.rating, 0) /
         reviews.length
       : accommodation.rating;
@@ -49,7 +98,7 @@ export default function AccommodationDetailPage({
         <div className="md:col-span-3">
           <Carousel className="w-full">
             <CarouselContent>
-              {accommodation.images.map((imgId, index) => (
+              {(accommodation.images || []).map((imgId, index) => (
                 <CarouselItem key={index}>
                   <Image
                     src={getPlaceholderImage(imgId).imageUrl}
@@ -77,12 +126,14 @@ export default function AccommodationDetailPage({
               <div className="flex items-center gap-2 pt-2">
                 <StarRating rating={averageRating} />
                 <span className="text-sm text-muted-foreground">
-                  ({reviews.length || accommodation.reviews} reviews)
+                  ({reviews?.length || accommodation.reviews} reviews)
                 </span>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-muted-foreground">{accommodation.description}</p>
+              <p className="text-muted-foreground">
+                {accommodation.description}
+              </p>
               <Separator />
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center gap-2">
@@ -102,7 +153,7 @@ export default function AccommodationDetailPage({
               <div>
                 <h3 className="mb-2 text-lg font-semibold">Amenities</h3>
                 <ul className="grid grid-cols-2 gap-2 text-sm">
-                  {accommodation.amenities.map((amenity, index) => (
+                  {(accommodation.amenities || []).map((amenity, index) => (
                     <li key={index} className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500" />
                       <span>{amenity}</span>
@@ -126,7 +177,12 @@ export default function AccommodationDetailPage({
         <Separator className="my-4" />
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            {reviews.length > 0 ? (
+            {reviewsLoading ? (
+              <div className="space-y-6">
+                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-32 w-full" />
+              </div>
+            ) : reviews && reviews.length > 0 ? (
               <div className="space-y-6">
                 {reviews.map((review) => (
                   <Card key={review.review_id}>
@@ -172,9 +228,7 @@ export default function AccommodationDetailPage({
           <div className="lg:col-span-1">
             <Card>
               <CardHeader>
-                <CardTitle className="font-headline">
-                  Leave a Review
-                </CardTitle>
+                <CardTitle className="font-headline">Leave a Review</CardTitle>
                 <CardContent className="p-0 pt-4">
                   <ReviewForm
                     itemId={accommodation.id}
