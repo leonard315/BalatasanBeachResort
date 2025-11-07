@@ -302,10 +302,19 @@ export default function AdminDashboardPage() {
           <Card className="flex flex-col">
               <CardHeader>
                   <CardTitle>Content Management</CardTitle>
-                  <CardDescription>Manage accommodations, tours, and other site content.</CardDescription>
+                  <CardDescription>Manage bookings, accommodations, tours, and other site content.</CardDescription>
               </CardHeader>
               <CardContent className="flex-grow">
                  <div className="flex flex-col space-y-4">
+                    <Link href="/admin/bookings" className="group">
+                      <div className="flex items-center justify-between rounded-lg border p-4 transition-all hover:bg-muted">
+                          <div className="flex items-center gap-4">
+                              <Book className="h-6 w-6 text-primary" />
+                              <p className="font-medium">Manage Bookings</p>
+                          </div>
+                          <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                      </div>
+                    </Link>
                     <Link href="/admin/accommodations" className="group">
                       <div className="flex items-center justify-between rounded-lg border p-4 transition-all hover:bg-muted">
                           <div className="flex items-center gap-4">
