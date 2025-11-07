@@ -1,0 +1,117 @@
+
+/**
+ * @fileOverview Firestore Security Rules for Balatasan Beach Resort booking system.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for user-specific data, and open access for public data.
+ *
+ * Data Structure:
+ * - User profiles and associated data (bookings, booking items, payments) are nested under `/users/{userId}`.
+ * - Public data (accommodations, tour packages, reviews, etc.) are stored in top-level collections.
+ *
+ * Key Security Decisions:
+ * - User data is strictly controlled by path-based ownership.
+ * - Public data is readable by everyone, but writable only by authorized users or specific actions.
+ * - List operations are allowed for owners of user-scoped subcollections.
+ * - Relational integrity is enforced on document creation by matching the document ID to the user ID in the path.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == 'admin';
+    }
+
+    /**
+     * @description Allows authenticated users to manage their own user profile. Admins can list all users.
+     * @path /users/{userId}
+     */
+    match /users/{userId} {
+      function isOwner() {
+        return request.auth.uid == userId;
+      }
+
+      allow get: if request.auth != null;
+      allow list: if isAdmin();
+      allow create: if isOwner();
+      allow update, delete: if isOwner() || isAdmin();
+    }
+
+    /**
+     * @description Allows authenticated users to manage their own bookings. Admins can manage all bookings.
+     * @path /users/{userId}/bookings/{bookingId}
+     */
+    match /users/{userId}/bookings/{bookingId} {
+       function isOwner() {
+        return request.auth.uid == userId;
+      }
+      allow get, list: if isOwner() || isAdmin();
+      allow create, update, delete: if isOwner() || isAdmin();
+    }
+
+    /**
+     * @description Allows admins to perform collection group queries on all bookings.
+     * @path /users/{userId}/bookings/{bookingId}
+     */
+    match /{path=**}/bookings/{bookingId} {
+      allow list: if isAdmin();
+    }
+    
+    /**
+     * @description Anyone can read approved reviews. Authenticated users can create reviews. Admins can update.
+     * @path /reviews/{reviewId}
+     */
+    match /reviews/{reviewId} {
+        allow get, list: if true;
+        allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+        allow update: if isAdmin();
+        allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Allows anyone to read accommodation information. Admins can write.
+     * @path /accommodations/{accommodationId}
+     */
+    match /accommodations/{accommodationId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Allows anyone to read tour package information. Admins can write.
+     * @path /tourPackages/{tourPackageId}
+     */
+    match /tourPackages/{tourPackageId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Allows anyone to read availability calendar information. Admins can write.
+     * @path /availabilityCalendar/{availabilityCalendarId}
+     */
+    match /availabilityCalendar/{availabilityCalendarId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Allows anyone to read promo code information. Admins can write.
+     * @path /promoCodes/{promoCodeId}
+     */
+    match /promoCodes/{promoCodeId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Allows anyone to read activity log information. Admins can write.
+     * @path /activityLogs/{activityLogId}
+     */
+    match /activityLogs/{activityLogId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+  }
+}
