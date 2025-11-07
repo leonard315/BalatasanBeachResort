@@ -104,7 +104,9 @@ export default function AccommodationDetailPage({
     reviews && reviews.length > 0
       ? reviews.reduce((acc, review) => acc + review.rating, 0) /
         reviews.length
-      : accommodation.rating;
+      : 0;
+  
+  const totalReviews = reviews?.length ?? 0;
 
   return (
     <div className="container mx-auto py-8 md:py-12">
@@ -140,7 +142,7 @@ export default function AccommodationDetailPage({
               <div className="flex items-center gap-2 pt-2">
                 <StarRating rating={averageRating} />
                 <span className="text-sm text-muted-foreground">
-                  ({reviews?.length || accommodation.reviews} reviews)
+                  ({totalReviews} reviews)
                 </span>
               </div>
             </CardHeader>

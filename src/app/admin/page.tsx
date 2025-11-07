@@ -1,7 +1,7 @@
 'use client';
 import { useMemo } from 'react';
 import { useUser } from '@/firebase';
-import { useUserById, useAllBookings, useAllUsers } from '@/lib/data';
+import { useUserById, useAllBookings, useAllUsers, useAllReviews } from '@/lib/data';
 import {
   Table,
   TableBody,
@@ -21,7 +21,7 @@ import {
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Book, Users, CreditCard, BedDouble, ArrowRight } from 'lucide-react';
+import { Loader2, Book, Users, CreditCard, BedDouble, ArrowRight, MessageSquare } from 'lucide-react';
 import type { Booking } from '@/lib/types';
 import {
   Bar,
@@ -153,18 +153,20 @@ export default function AdminDashboardPage() {
   );
   const { data: allBookings, isLoading: bookingsLoading } = useAllBookings();
   const { data: allUsers, isLoading: usersLoading } = useAllUsers();
+  const { data: allReviews, isLoading: reviewsLoading } = useAllReviews();
 
   const isLoading =
-    isUserLoading || isProfileLoading || bookingsLoading || usersLoading;
+    isUserLoading || isProfileLoading || bookingsLoading || usersLoading || reviewsLoading;
   const isAdmin = userProfile?.userType === 'admin';
 
   const stats = useMemo(() => {
-    if (!allBookings || !allUsers) {
+    if (!allBookings || !allUsers || !allReviews) {
       return {
         totalRevenue: 0,
         totalBookings: 0,
         pendingBookings: 0,
         totalCustomers: 0,
+        pendingReviews: 0,
       };
     }
 
@@ -176,13 +178,18 @@ export default function AdminDashboardPage() {
       (b) => b.booking_status === 'pending'
     ).length;
 
+    const pendingReviews = allReviews.filter(
+        (r) => !r.isApproved
+    ).length;
+
     return {
       totalRevenue,
       totalBookings: allBookings.length,
       pendingBookings,
       totalCustomers: allUsers.length,
+      pendingReviews,
     };
-  }, [allBookings, allUsers]);
+  }, [allBookings, allUsers, allReviews]);
 
   const bookingChartData = useMemo(() => {
     const data: { [key: string]: number } = {};
@@ -245,7 +252,7 @@ export default function AdminDashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
@@ -281,6 +288,18 @@ export default function AdminDashboardPage() {
             <div className="text-2xl font-bold">+{stats.pendingBookings}</div>
              <p className="text-xs text-muted-foreground">
               Awaiting confirmation
+            </p>
+          </CardContent>
+        </Card>
+         <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pending Reviews</CardTitle>
+            <MessageSquare className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">+{stats.pendingReviews}</div>
+             <p className="text-xs text-muted-foreground">
+              Awaiting approval
             </p>
           </CardContent>
         </Card>
@@ -324,7 +343,15 @@ export default function AdminDashboardPage() {
                           <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
                       </div>
                     </Link>
-                    {/* Add links for tours etc. here */}
+                     <Link href="/admin/reviews" className="group">
+                      <div className="flex items-center justify-between rounded-lg border p-4 transition-all hover:bg-muted">
+                          <div className="flex items-center gap-4">
+                              <MessageSquare className="h-6 w-6 text-primary" />
+                              <p className="font-medium">Manage Reviews</p>
+                          </div>
+                          <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                      </div>
+                    </Link>
                  </div>
               </CardContent>
           </Card>

@@ -147,13 +147,23 @@ export function useReviewsByItemId(itemId: string | null) {
             itemId
                 ? query(
                     collection(firestore, 'reviews'),
-                    where('itemId', '==', itemId)
+                    where('itemId', '==', itemId),
+                    where('isApproved', '==', true)
                   )
                 : null,
         [itemId]
     );
     return useCollection<Review>(reviewsQuery as Query<Review> | null);
 }
+
+export function useAllReviews() {
+    const reviewsQuery = useMemoFirebase(
+        () => collection(firestore, 'reviews') as Query<Review>,
+        []
+    );
+    return useCollection<Review>(reviewsQuery);
+}
+
 
 // --- Static Data (To be removed or used for seeding) ---
 
