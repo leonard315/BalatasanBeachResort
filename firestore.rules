@@ -1,3 +1,4 @@
+
 /**
  * @fileOverview Firestore Security Rules for Balatasan Beach Resort booking system.
  *
@@ -46,8 +47,7 @@ service cloud.firestore {
         return request.auth.uid == userId;
       }
       allow get, list: if isOwner() || isAdmin();
-      allow create: if isOwner() || isAdmin();
-      allow update, delete: if isOwner() || isAdmin();
+      allow create, update, delete: if isOwner() || isAdmin();
     }
 
     /**
