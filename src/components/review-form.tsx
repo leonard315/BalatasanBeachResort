@@ -8,13 +8,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { InteractiveStarRating } from '@/components/star-rating';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, Info, Loader2, TriangleAlert } from 'lucide-react';
+import { CheckCircle, Info, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from './ui/card';
+import type { User } from 'firebase/auth';
+import { Input } from './ui/input';
 
 interface ReviewFormProps {
   itemId: string;
   itemType: 'accommodation' | 'tour';
+  user: User;
 }
 
 function SubmitButton() {
@@ -27,7 +30,7 @@ function SubmitButton() {
   );
 }
 
-export function ReviewForm({ itemId, itemType }: ReviewFormProps) {
+export function ReviewForm({ itemId, itemType, user }: ReviewFormProps) {
   const initialState: ReviewState = { message: null, errors: {} };
   const [state, dispatch] = useActionState(submitReview, initialState);
   const [rating, setRating] = useState(0);
@@ -39,6 +42,7 @@ export function ReviewForm({ itemId, itemType }: ReviewFormProps) {
         title: "Success",
         description: state.message,
       });
+      // Optionally reset form state here if needed
     } else if (!state.success && state.message) {
        toast({
         title: "Error",
@@ -54,35 +58,11 @@ export function ReviewForm({ itemId, itemType }: ReviewFormProps) {
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-4">
              <CheckCircle className="h-6 w-6 text-green-500" />
-            <h3 className="text-lg font-semibold">Review Submitted!</h3>
+            <h3 className="text-lg font-semibold">Thank you for your review!</h3>
           </div>
           <p className="text-sm text-muted-foreground mb-4">
-            Our AI has analyzed your review. Here are the results:
+            It has been submitted successfully and will be visible shortly.
           </p>
-          <div className='space-y-4'>
-            <Alert variant={state.aiResponse.isAppropriate ? "default" : "destructive"}>
-              <Info className="h-4 w-4" />
-              <AlertTitle>Content Analysis</AlertTitle>
-              <AlertDescription>
-                {state.aiResponse.isAppropriate
-                  ? 'Your review seems appropriate. Thank you!'
-                  : 'Your review may contain inappropriate content.'}
-              </AlertDescription>
-            </Alert>
-             <Alert>
-              <Info className="h-4 w-4" />
-              <AlertTitle>Suggested Changes</AlertTitle>
-              <AlertDescription>
-                {state.aiResponse.suggestedChanges}
-              </AlertDescription>
-            </Alert>
-            <div>
-              <Label className='font-medium'>Revised Review</Label>
-              <p className="text-sm p-3 bg-secondary rounded-md mt-1">
-                {state.aiResponse.revisedReviewText}
-              </p>
-            </div>
-          </div>
         </CardContent>
       </Card>
     );
@@ -93,6 +73,9 @@ export function ReviewForm({ itemId, itemType }: ReviewFormProps) {
       <input type="hidden" name="itemId" value={itemId} />
       <input type="hidden" name="itemType" value={itemType} />
       <input type="hidden" name="rating" value={rating} />
+      <input type="hidden" name="userId" value={user.uid} />
+      <input type="hidden" name="userName" value={user.displayName || 'Anonymous'} />
+      <input type="hidden" name="userAvatar" value={user.photoURL || ''} />
 
       <div className="space-y-2">
         <Label htmlFor="rating">Your Rating</Label>
@@ -100,6 +83,20 @@ export function ReviewForm({ itemId, itemType }: ReviewFormProps) {
         {state.errors?.rating && (
           <p className="text-sm font-medium text-destructive">
             {state.errors.rating[0]}
+          </p>
+        )}
+      </div>
+
+       <div className="space-y-2">
+        <Label htmlFor="title">Review Title</Label>
+        <Input
+          id="title"
+          name="title"
+          placeholder="A brief title for your review"
+        />
+        {state.errors?.title && (
+          <p className="text-sm font-medium text-destructive">
+            {state.errors.title[0]}
           </p>
         )}
       </div>

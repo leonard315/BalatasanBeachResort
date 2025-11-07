@@ -44,16 +44,18 @@ export interface Booking {
 }
 
 export interface Review {
-    review_id: string;
-    item_id: string;
+    id: string;
+    itemId: string;
+    itemType: 'accommodation' | 'tour';
+    userId: string;
     user_name: string;
     user_avatar: string;
     rating: number;
     title: string;
     comment: string;
-    created_at: string;
-    userId?: string;
-    isApproved?: boolean;
+    created_at: any; // Firestore Timestamp
+    isApproved: boolean;
+    original_comment: string;
 }
 
 export interface WaterSport {

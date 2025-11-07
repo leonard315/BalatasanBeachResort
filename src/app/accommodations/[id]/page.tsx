@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getAccommodationById, getReviewsByItemId } from '@/lib/data';
+import { useAccommodationById, useReviewsByItemId } from '@/lib/data';
 import { getPlaceholderImage } from '@/lib/utils';
 import {
   Carousel,
@@ -18,12 +18,14 @@ import {
   Users,
   Check,
   Calendar,
+  Loader2
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { StarRating } from '@/components/star-rating';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ReviewForm } from '@/components/review-form';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useUser } from '@/firebase';
 
 function AccommodationDetailSkeleton() {
   return (
@@ -74,13 +76,29 @@ export default function AccommodationDetailPage({
 }: {
   params: { id: string };
 }) {
-  const accommodation = getAccommodationById(params.id);
-  const reviews = getReviewsByItemId(params.id);
+  const { user } = useUser();
+  const { data: accommodation, isLoading: isAccommodationLoading } = useAccommodationById(params.id);
+  const { data: reviews, isLoading: areReviewsLoading } = useReviewsByItemId(params.id);
 
+
+  if (isAccommodationLoading) {
+    return <AccommodationDetailSkeleton />;
+  }
 
   if (!accommodation) {
     notFound();
   }
+  
+  const formatDate = (timestamp: any) => {
+    if (timestamp && timestamp.toDate) {
+      return timestamp.toDate().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    }
+    return 'Just now';
+  };
 
   const averageRating =
     reviews && reviews.length > 0
@@ -172,14 +190,18 @@ export default function AccommodationDetailPage({
         <Separator className="my-4" />
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            {reviews && reviews.length > 0 ? (
+             {areReviewsLoading ? (
+               <div className="flex justify-center items-center h-40">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+               </div>
+            ) : reviews && reviews.length > 0 ? (
               <div className="space-y-6">
                 {reviews.map((review) => (
-                  <Card key={review.review_id}>
+                  <Card key={review.id}>
                     <CardHeader className="flex flex-row items-start gap-4">
                       <Avatar>
                         <AvatarImage
-                          src={getPlaceholderImage(review.user_avatar).imageUrl}
+                          src={review.user_avatar || getPlaceholderImage('user-avatar-2').imageUrl}
                           alt={review.user_name}
                           data-ai-hint="person portrait"
                         />
@@ -194,7 +216,7 @@ export default function AccommodationDetailPage({
                         <div className="flex items-center justify-between">
                           <h3 className="font-semibold">{review.user_name}</h3>
                           <span className="text-xs text-muted-foreground">
-                            {review.created_at}
+                            {formatDate(review.created_at)}
                           </span>
                         </div>
                         <StarRating rating={review.rating} size={16} />
@@ -220,10 +242,17 @@ export default function AccommodationDetailPage({
               <CardHeader>
                 <CardTitle className="font-headline">Leave a Review</CardTitle>
                 <CardContent className="p-0 pt-4">
-                  <ReviewForm
-                    itemId={accommodation.id}
-                    itemType="accommodation"
-                  />
+                 {user ? (
+                    <ReviewForm
+                      itemId={accommodation.id}
+                      itemType="accommodation"
+                      user={user}
+                    />
+                  ) : (
+                    <p className="text-sm text-center text-muted-foreground pt-4">
+                      Please <a href="/login" className="underline">log in</a> to leave a review.
+                    </p>
+                  )}
                 </CardContent>
               </CardHeader>
             </Card>

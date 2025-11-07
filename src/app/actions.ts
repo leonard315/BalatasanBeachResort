@@ -5,17 +5,24 @@ import { z } from 'zod';
 import type { ModerateReviewOutput } from '@/ai/flows/review-moderation-and-suggestions';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { adminDb } from '@/firebase/server';
 
 const ReviewSchema = z.object({
   rating: z.coerce.number().min(1, 'Rating is required.').max(5),
+  title: z.string().min(5, 'Title must be at least 5 characters long.'),
   reviewText: z.string().min(10, 'Review must be at least 10 characters long.'),
   itemId: z.string(),
   itemType: z.enum(['accommodation', 'tour']),
+  userId: z.string().min(1, 'User must be logged in.'),
+  userName: z.string().min(1, 'User name is required.'),
+  userAvatar: z.string().url('Invalid user avatar URL.').or(z.literal('')),
 });
 
 export type ReviewState = {
   errors?: {
     rating?: string[];
+    title?: string[];
     reviewText?: string[];
   };
   message?: string | null;
@@ -29,9 +36,13 @@ export async function submitReview(
 ): Promise<ReviewState> {
   const validatedFields = ReviewSchema.safeParse({
     rating: formData.get('rating'),
+    title: formData.get('title'),
     reviewText: formData.get('reviewText'),
     itemId: formData.get('itemId'),
     itemType: formData.get('itemType'),
+    userId: formData.get('userId'),
+    userName: formData.get('userName'),
+    userAvatar: formData.get('userAvatar'),
   });
 
   if (!validatedFields.success) {
@@ -42,12 +53,30 @@ export async function submitReview(
     };
   }
 
-  try {
-    const aiResponse = await moderateReviewFlow(validatedFields.data);
+  const { reviewText, rating, itemType, itemId, userId, userName, userAvatar, title } =
+    validatedFields.data;
 
-    // In a real application, you would now save the `aiResponse.revisedReviewText`
-    // and other details to your database.
-    // For this demo, we'll just simulate success.
+  try {
+    const aiResponse = await moderateReviewFlow({
+      reviewText,
+      rating,
+      itemType,
+      itemId,
+    });
+
+    await addDoc(collection(adminDb, 'reviews'), {
+      itemId: itemId,
+      itemType: itemType,
+      userId: userId,
+      user_name: userName,
+      user_avatar: userAvatar,
+      rating: rating,
+      title: title,
+      comment: aiResponse.revisedReviewText,
+      isApproved: aiResponse.isAppropriate,
+      created_at: serverTimestamp(),
+      original_comment: reviewText,
+    });
 
     revalidatePath(`/accommodations/${validatedFields.data.itemId}`);
 
