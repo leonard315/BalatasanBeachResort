@@ -1,6 +1,5 @@
 'use server';
 
-import { doc, updateDoc } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 import { adminDb } from '@/firebase/server';
 import type { Booking } from '@/lib/types';
@@ -18,6 +17,7 @@ export async function updateBookingStatus(
     const bookingPath = `users/${userId}/bookings/${bookingId}`;
     const bookingRef = adminDb.doc(bookingPath);
 
+    // Correctly use the .update() method from the Admin SDK
     await bookingRef.update({ booking_status: status });
 
     revalidatePath('/admin/bookings');
