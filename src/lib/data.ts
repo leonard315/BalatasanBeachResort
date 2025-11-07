@@ -22,6 +22,7 @@ import type {
   WaterSport,
   User,
 } from './types';
+import { useMemo } from 'react';
 
 
 // --- Data Creation/Update ---
@@ -121,12 +122,15 @@ export function useAllBookings() {
         () => collectionGroup(firestore, 'bookings') as Query<Booking>,
         []
     );
-     const { data, isLoading, error } = useCollection<Omit<Booking, 'userId'>>(bookingsQuery);
+     const { data, isLoading, error } = useCollection<Booking>(bookingsQuery);
 
-    const bookingsWithUserId = useMemoFirebase(() => {
+    const bookingsWithUserId = useMemo(() => {
         if (!data) return null;
+        // The `ref` property is added by the useCollection hook.
+        // It contains the DocumentReference.
         return data.map(booking => {
             const pathParts = (booking as any).ref?.path.split('/');
+            // The path is users/{userId}/bookings/{bookingId}
             const userId = pathParts && pathParts.length > 1 ? pathParts[1] : 'unknown';
             return { ...booking, userId };
         });
