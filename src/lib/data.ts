@@ -45,7 +45,7 @@ export async function createOrUpdateUser(user: FirebaseUser, additionalData: Par
     if (!docSnap.exists()) {
         const [firstName, ...lastName] = user.displayName?.split(' ') || [additionalData.firstName || 'New', additionalData.lastName || 'User'];
         // Special case for the admin user
-        const userType = user.email === 'admin@balatasan.com' ? 'admin' : 'guest';
+        const userType = user.email === 'admin@balatasanresort.com' ? 'admin' : 'guest';
 
         userData = {
             id: user.uid,
