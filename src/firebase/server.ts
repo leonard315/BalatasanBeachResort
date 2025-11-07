@@ -5,21 +5,26 @@ import { getFirestore } from 'firebase-admin/firestore';
 // IMPORTANT: This service account key is required for server-side authentication (e.g., in Server Actions).
 // You must create a service account in your Firebase project settings, generate a new private key (JSON file),
 // and set the contents of that JSON file as a `FIREBASE_SERVICE_ACCOUNT_KEY` environment variable in your deployment environment.
-const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY
-  ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY)
-  : undefined;
+const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 
 let app: App;
 
 if (getApps().length === 0) {
-  if (serviceAccount) {
-    app = initializeApp({
-      credential: cert(serviceAccount),
-    });
+  if (serviceAccountString) {
+    try {
+      const serviceAccount = JSON.parse(serviceAccountString);
+      app = initializeApp({
+        credential: cert(serviceAccount),
+      });
+    } catch (error) {
+      console.error('Error parsing Firebase service account key:', error);
+      // Fallback to default initialization if parsing fails
+      app = initializeApp();
+    }
   } else {
     // This is for local development without service account credentials.
     // It will use the default credentials if available (e.g., from gcloud CLI).
-    // This will likely fail in a deployed environment like Vercel without a service account.
+    console.warn("FIREBASE_SERVICE_ACCOUNT_KEY not set. Using default credentials for local development. This will fail in a deployed environment.");
     app = initializeApp();
   }
 } else {
