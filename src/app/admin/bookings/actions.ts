@@ -15,12 +15,14 @@ export async function updateBookingStatus(
   }
 
   try {
-    const bookingRef = adminDb.collection('users').doc(userId).collection('bookings').doc(bookingId);
+    const bookingPath = `users/${userId}/bookings/${bookingId}`;
+    const bookingRef = adminDb.doc(bookingPath);
+
     await bookingRef.update({ booking_status: status });
 
     revalidatePath('/admin/bookings');
     revalidatePath('/admin');
-    revalidatePath('/bookings'); // For the user's view
+    revalidatePath(`/bookings`); // For the specific user's view
 
     return { success: true, message: `Booking status updated to ${status}.` };
   } catch (error) {
