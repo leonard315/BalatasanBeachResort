@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-import { useAuth, useFirestore } from '@/firebase';
+import { auth, firestore } from '@/firebase';
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -23,7 +23,6 @@ import {
   AuthError,
   updateProfile,
 } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { createOrUpdateUser } from '@/lib/data';
 
@@ -44,8 +43,6 @@ function SubmitButton() {
 
 export default function SignupPage() {
   const { toast } = useToast();
-  const auth = useAuth();
-  const firestore = useFirestore();
   const router = useRouter();
 
   const initialState: SignupState = {
@@ -83,6 +80,9 @@ export default function SignupPage() {
           let message = 'An unknown error occurred.';
           if (error.code === 'auth/email-already-in-use') {
             message = 'This email address is already in use.';
+          } else if (error.code === 'auth/operation-not-allowed') {
+            message =
+              'Email/Password authentication is not enabled. Please check your Firebase project settings.';
           }
           toast({
             variant: 'destructive',
@@ -99,7 +99,7 @@ export default function SignupPage() {
       }
     }
     handleSignup();
-  }, [state, auth, firestore, toast, router]);
+  }, [state, toast, router]);
 
   const handleGoogleSignup = async () => {
     if (!auth || !firestore) return;
@@ -113,12 +113,18 @@ export default function SignupPage() {
         description: 'Account created successfully with Google!',
       });
       router.push('/bookings');
-    } catch (error) {
+    } catch (e) {
+      const error = e as AuthError;
+      let description = error.message;
+      if (error.code === 'auth/operation-not-allowed') {
+        description =
+          'Google Sign-In is not enabled. Please check your Firebase project settings.';
+      }
       console.error('Google signup failed:', error);
       toast({
         variant: 'destructive',
         title: 'Google Sign-up Failed',
-        description: 'Could not sign up with Google. Please try again.',
+        description: description,
       });
     }
   };

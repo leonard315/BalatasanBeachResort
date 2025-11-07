@@ -15,6 +15,7 @@ import { Menu, Mountain } from 'lucide-react';
 import { useUser } from '@/firebase';
 import { useUserById } from '@/lib/data';
 import { logout } from '@/app/actions';
+import { auth } from '@/firebase';
 
 export function Header() {
   const { user, isUserLoading } = useUser();
@@ -28,6 +29,11 @@ export function Header() {
       .split(' ')
       .map((n) => n[0])
       .join('');
+  };
+
+  const handleLogout = async () => {
+    await auth.signOut();
+    // The form submission will trigger a re-render/redirect handled by the server action
   };
 
   return (
@@ -141,7 +147,7 @@ export function Header() {
                   </>
                 ) : (
                    <form action={logout}>
-                      <Button type="submit" variant="ghost" className="w-full justify-start">Logout</Button>
+                      <Button type="submit" variant="ghost" className="w-full justify-start" onClick={handleLogout}>Logout</Button>
                    </form>
                 )}
               </div>
@@ -199,7 +205,7 @@ export function Header() {
                   )}
                   <DropdownMenuSeparator />
                   <form action={logout} className="w-full">
-                    <button type="submit" className="w-full">
+                    <button type="submit" className="w-full" onClick={handleLogout}>
                       <DropdownMenuItem className="w-full cursor-pointer">
                         Log out
                       </DropdownMenuItem>

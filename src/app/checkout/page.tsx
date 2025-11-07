@@ -26,7 +26,7 @@ import {
 import { processBooking, type BookingState } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
-import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
+import { useUser, firestore, useMemoFirebase } from '@/firebase';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -54,7 +54,6 @@ function CheckoutPage() {
   const activityId = searchParams.get('activityId');
   const { toast } = useToast();
   const { user, isUserLoading } = useUser();
-  const firestore = useFirestore();
   const [guests, setGuests] = useState(1);
   const [showGCashDialog, setShowGCashDialog] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('gcash');
@@ -138,7 +137,7 @@ function CheckoutPage() {
       }
     }
     handleBooking();
-  }, [state, toast, router, firestore, user, activity, total]);
+  }, [state, toast, router, activity, total, user]);
 
   if (isUserLoading) {
     return (

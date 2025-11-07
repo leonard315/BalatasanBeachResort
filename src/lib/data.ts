@@ -12,7 +12,7 @@ import {
   type Query,
   collectionGroup,
 } from 'firebase/firestore';
-import { useFirestore, useUser, useCollection, useDoc, useMemoFirebase } from '@/firebase';
+import { useCollection, useDoc, useMemoFirebase, firestore, useUser } from '@/firebase';
 import type { User as FirebaseUser } from 'firebase/auth';
 import type {
   Accommodation,
@@ -36,7 +36,6 @@ import type {
  */
 export async function createOrUpdateUser(user: FirebaseUser, additionalData: Partial<User> = {}) {
     if (!user) return;
-    const firestore = getFirestore();
     const userRef = doc(firestore, 'users', user.uid);
     const docSnap = await getDoc(userRef);
 
@@ -62,7 +61,11 @@ export async function createOrUpdateUser(user: FirebaseUser, additionalData: Par
         // If doc exists, just merge new data
         userData = {
             ...docSnap.data() as User,
-            ...additionalData
+            ...additionalData,
+            // Ensure important fields are not overwritten with null/undefined from additionalData
+            email: user.email!,
+            photoURL: user.photoURL || docSnap.data().photoURL || '',
+            displayName: user.displayName || docSnap.data().displayName || '',
         };
     }
 
@@ -73,34 +76,30 @@ export async function createOrUpdateUser(user: FirebaseUser, additionalData: Par
 // --- Data Fetching Hooks ---
 
 export function useAccommodations() {
-  const firestore = useFirestore();
   const accommodationsCollection = useMemoFirebase(
     () => collection(firestore, 'accommodations') as CollectionReference<Accommodation>,
-    [firestore]
+    []
   );
   return useCollection<Accommodation>(accommodationsCollection);
 }
 
 export function useAccommodationById(id: string | null | undefined) {
-    const firestore = useFirestore();
     const accommodationDoc = useMemoFirebase(
         () => (id ? doc(firestore, 'accommodations', id) as DocumentReference<Accommodation> : null),
-        [firestore, id]
+        [id]
     );
     return useDoc<Accommodation>(accommodationDoc);
 }
 
 export function useTours() {
-  const firestore = useFirestore();
   const toursCollection = useMemoFirebase(
     () => collection(firestore, 'tourPackages') as CollectionReference<Tour>,
-    [firestore]
+    []
   );
   return useCollection<Tour>(toursCollection);
 }
 
 export function useUserBookings() {
-    const firestore = useFirestore();
     const { user } = useUser();
     const bookingsCollection = useMemoFirebase(
         () =>
@@ -112,41 +111,37 @@ export function useUserBookings() {
                     'bookings'
                   ) as CollectionReference<Booking>)
                 : null,
-        [firestore, user]
+        [user]
     );
     return useCollection<Booking>(bookingsCollection);
 }
 
 export function useAllBookings() {
-    const firestore = useFirestore();
     const bookingsQuery = useMemoFirebase(
         () => collectionGroup(firestore, 'bookings') as Query<Booking>,
-        [firestore]
+        []
     );
     return useCollection<Booking>(bookingsQuery);
 }
 
 export function useUserById(userId: string | null) {
-    const firestore = useFirestore();
     const userDoc = useMemoFirebase(
         () => (userId ? doc(firestore, 'users', userId) as DocumentReference<User> : null),
-        [firestore, userId]
+        [userId]
     );
     return useDoc<User>(userDoc);
 }
 
 export function useAllUsers() {
-    const firestore = useFirestore();
     const usersCollection = useMemoFirebase(
         () => collection(firestore, 'users') as CollectionReference<User>,
-        [firestore]
+        []
     );
     return useCollection<User>(usersCollection);
 }
 
 
 export function useReviewsByItemId(itemId: string | null) {
-    const firestore = useFirestore();
     const reviewsQuery = useMemoFirebase(
         () =>
             itemId
@@ -155,7 +150,7 @@ export function useReviewsByItemId(itemId: string | null) {
                     where('itemId', '==', itemId)
                   )
                 : null,
-        [firestore, itemId]
+        [itemId]
     );
     return useCollection<Review>(reviewsQuery as Query<Review> | null);
 }

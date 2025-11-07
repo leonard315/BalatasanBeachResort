@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { getPlaceholderImage } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
-import { useAuth } from '@/firebase';
+import { auth } from '@/firebase';
 import {
   GoogleAuthProvider,
   signInWithEmailAndPassword,
@@ -44,7 +44,6 @@ function SubmitButton() {
 
 export default function LoginPage() {
   const router = useRouter();
-  const auth = useAuth();
   const { toast } = useToast();
   const initialState: LoginState = { message: null, errors: {} };
   const [state, dispatch] = useActionState(login, initialState);
@@ -68,6 +67,9 @@ export default function LoginPage() {
           if (error.code === 'auth/invalid-credential') {
             description =
               'The email or password you entered is incorrect. Please check your credentials and try again.';
+          } else if (error.code === 'auth/operation-not-allowed') {
+             description =
+              'Email/Password authentication is not enabled. Please check your Firebase project settings.';
           }
           toast({
             variant: 'destructive',
@@ -84,7 +86,7 @@ export default function LoginPage() {
       }
     }
     handleLogin();
-  }, [state, auth, router, toast]);
+  }, [state, router, toast]);
 
   const handleGoogleLogin = async () => {
     if (!auth) return;
@@ -94,13 +96,18 @@ export default function LoginPage() {
       // Create user document if it doesn't exist
       await createOrUpdateUser(result.user);
       router.push('/bookings');
-    } catch (error) {
+    } catch (e) {
+       const error = e as AuthError;
+       let description = error.message;
+        if (error.code === 'auth/operation-not-allowed') {
+            description =
+             'Google Sign-In is not enabled. Please check your Firebase project settings.';
+        }
       console.error('Google login failed:', error);
       toast({
         variant: 'destructive',
         title: 'Google Login Failed',
-        description:
-          'Could not sign in with Google. Please try again.',
+        description: description,
       });
     }
   };
