@@ -121,7 +121,18 @@ export function useAllBookings() {
         () => collectionGroup(firestore, 'bookings') as Query<Booking>,
         []
     );
-    return useCollection<Booking>(bookingsQuery);
+     const { data, isLoading, error } = useCollection<Omit<Booking, 'userId'>>(bookingsQuery);
+
+    const bookingsWithUserId = useMemoFirebase(() => {
+        if (!data) return null;
+        return data.map(booking => {
+            const pathParts = (booking as any).ref?.path.split('/');
+            const userId = pathParts && pathParts.length > 1 ? pathParts[1] : 'unknown';
+            return { ...booking, userId };
+        });
+    }, [data]);
+
+    return { data: bookingsWithUserId, isLoading, error };
 }
 
 export function useUserById(userId: string | null) {
