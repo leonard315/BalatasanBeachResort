@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { getPlaceholderImage } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
-import { auth } from '@/firebase';
+import { auth, firebaseApp } from '@/firebase';
 import {
   GoogleAuthProvider,
   signInWithEmailAndPassword,
@@ -47,6 +47,13 @@ export default function LoginPage() {
   const { toast } = useToast();
   const initialState: LoginState = { message: null, errors: {} };
   const [state, dispatch] = useActionState(login, initialState);
+
+  useEffect(() => {
+    // One-time debug log to verify the project ID
+    if (firebaseApp) {
+      console.log('Firebase App is connected to Project ID:', firebaseApp.options.projectId);
+    }
+  }, []);
 
   useEffect(() => {
     async function handleLogin() {
