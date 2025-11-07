@@ -27,6 +27,14 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { createOrUpdateUser } from '@/lib/data';
 
+/**
+ * Helper function to determine redirect path based on user email
+ * Admin users are redirected to /admin, regular users to /bookings
+ */
+function getRedirectPath(email: string): string {
+  return email === 'admin@balatasanresort.com' ? '/admin' : '/bookings';
+}
+
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
@@ -67,7 +75,9 @@ export default function LoginPage() {
           const user = userCredential.user;
           // Create user document if it doesn't exist
           await createOrUpdateUser(user);
-          router.push('/bookings');
+          // Redirect based on user role
+          const redirectPath = getRedirectPath(user.email || '');
+          router.push(redirectPath);
         } catch (e) {
           const error = e as AuthError;
           let description = error.message;
@@ -102,7 +112,9 @@ export default function LoginPage() {
       const result = await signInWithPopup(auth, provider);
       // Create user document if it doesn't exist
       await createOrUpdateUser(result.user);
-      router.push('/bookings');
+      // Redirect based on user role
+      const redirectPath = getRedirectPath(result.user.email || '');
+      router.push(redirectPath);
     } catch (e) {
        const error = e as AuthError;
        let description = error.message;
