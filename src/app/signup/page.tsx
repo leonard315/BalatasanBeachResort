@@ -69,7 +69,7 @@ export default function SignupPage() {
 
           toast({
             title: 'Success!',
-            description: 'Successfully Created',
+            description: 'Account created successfully. Please log in.',
           });
 
           setTimeout(() => {
@@ -79,10 +79,10 @@ export default function SignupPage() {
           const error = e as AuthError;
           let message = 'An unknown error occurred.';
           if (error.code === 'auth/email-already-in-use') {
-            message = 'This email address is already in use.';
+            message = 'This email address is already in use by another account.';
           } else if (error.code === 'auth/operation-not-allowed') {
             message =
-              'Email/Password authentication is not enabled. Please check your Firebase project settings.';
+              'Email/Password sign-up is not enabled. Please check your Firebase project settings.';
           }
           toast({
             variant: 'destructive',
