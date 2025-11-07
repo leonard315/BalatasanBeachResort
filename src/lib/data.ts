@@ -352,3 +352,5 @@ export const getAccommodationById = (id: string): Accommodation | undefined => a
 
 export const getBookings = (): Booking[] => bookings;
 export const getReviewsByItemId = (itemId: string): Review[] => reviews.filter(review => review.item_id === itemId);
+
+    
