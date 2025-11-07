@@ -32,7 +32,7 @@ import { createOrUpdateUser } from '@/lib/data';
  * Admin users are redirected to /admin, regular users to /bookings
  */
 function getRedirectPath(email: string): string {
-  return email === 'admin@balatasanresort.com' ? '/admin' : '/bookings';
+  return email === 'admin@balatasan.com' ? '/admin' : '/bookings';
 }
 
 function SubmitButton() {
