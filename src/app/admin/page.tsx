@@ -1,5 +1,5 @@
 'use client';
-import { useMemo } from 'react';
+import { useMemo, startTransition } from 'react';
 import { useUser } from '@/firebase';
 import { useUserById, useAllBookings, useAllUsers, useAllReviews } from '@/lib/data';
 import {
@@ -21,8 +21,18 @@ import {
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Book, Users, CreditCard, BedDouble, ArrowRight, MessageSquare } from 'lucide-react';
+import { Loader2, Book, Users, CreditCard, BedDouble, ArrowRight, MessageSquare, MoreHorizontal, Hourglass, Check, CalendarCheck2, X } from 'lucide-react';
 import type { Booking } from '@/lib/types';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import { useToast } from '@/hooks/use-toast';
+import { updateBookingStatus } from './bookings/actions';
 import {
   Bar,
   BarChart,
@@ -47,6 +57,7 @@ function AdminBookingsSkeleton() {
           <TableHead>Dates</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="text-right">Total</TableHead>
+          <TableHead><span className="sr-only">Actions</span></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -70,6 +81,9 @@ function AdminBookingsSkeleton() {
             <TableCell className="text-right">
               <Skeleton className="ml-auto h-6 w-16" />
             </TableCell>
+            <TableCell>
+              <Skeleton className="ml-auto h-8 w-8" />
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -79,11 +93,30 @@ function AdminBookingsSkeleton() {
 
 function BookingRow({ booking }: { booking: Booking }) {
   const { data: bookingUser, isLoading } = useUserById(booking.userId);
+  const { toast } = useToast();
+
+   const handleStatusChange = async (newStatus: Booking['booking_status']) => {
+        startTransition(async () => {
+            const result = await updateBookingStatus(booking.userId, booking.id, newStatus);
+            if (result.success) {
+                toast({
+                    title: 'Success!',
+                    description: result.message,
+                });
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Error',
+                    description: result.message,
+                });
+            }
+        });
+    };
 
   if (isLoading) {
     return (
       <TableRow>
-        <TableCell colSpan={5} className="text-center">
+        <TableCell colSpan={6} className="text-center">
           <Loader2 className="mx-auto h-6 w-6 animate-spin" />
         </TableCell>
       </TableRow>
@@ -141,6 +174,39 @@ function BookingRow({ booking }: { booking: Booking }) {
       </TableCell>
       <TableCell className="text-right font-medium">
         ₱{booking.total_amount.toFixed(2)}
+      </TableCell>
+       <TableCell>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button aria-haspopup="true" size="icon" variant="ghost">
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Change Status</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => handleStatusChange('pending')}>
+              <Hourglass className="mr-2" />
+              Pending
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleStatusChange('confirmed')}>
+              <Check className="mr-2" />
+              Confirm
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleStatusChange('completed')}>
+              <CalendarCheck2 className="mr-2" />
+              Complete
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() => handleStatusChange('cancelled')}
+              className="text-destructive"
+            >
+              <X className="mr-2" />
+              Cancel
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </TableCell>
     </TableRow>
   );
@@ -396,8 +462,14 @@ export default function AdminDashboardPage() {
 
 
       <Card>
-        <CardHeader>
-          <CardTitle>Recent Bookings</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div >
+            <CardTitle>Recent Bookings</CardTitle>
+            <CardDescription>A list of the 5 most recent bookings.</CardDescription>
+          </div>
+           <Button asChild size="sm">
+            <Link href="/admin/bookings">View All</Link>
+          </Button>
         </CardHeader>
         <CardContent className="p-0">
           {bookingsLoading ? (
@@ -411,6 +483,9 @@ export default function AdminDashboardPage() {
                   <TableHead>Dates</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Total</TableHead>
+                   <TableHead>
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -431,3 +506,5 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
+
+    
