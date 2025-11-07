@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { saveAccommodation, type AccommodationState } from '../actions';
-import { useFormState } from 'react-dom';
+import { useFormState, useFormStatus } from 'react-dom';
 import { useToast } from '@/hooks/use-toast';
 import type { Accommodation } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
@@ -195,5 +195,3 @@ export function AccommodationForm({
     </Dialog>
   );
 }
-
-    

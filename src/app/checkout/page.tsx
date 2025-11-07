@@ -1,6 +1,6 @@
 'use client';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useState, Suspense } from 'react';
 import { useFormStatus } from 'react-dom';
 import { getWaterSports, getTours, getAccommodations } from '@/lib/data';
 import { Button } from '@/components/ui/button';
@@ -48,7 +48,7 @@ function SubmitButton() {
   );
 }
 
-export default function CheckoutPage() {
+function CheckoutPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const activityId = searchParams.get('activityId');
@@ -415,3 +415,14 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
+// Wrap CheckoutPage with Suspense
+function CheckoutPageWithSuspense() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutPage />
+    </Suspense>
+  );
+}
+
+export default CheckoutPageWithSuspense;

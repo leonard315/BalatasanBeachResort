@@ -1,10 +1,9 @@
 'use server';
 
 import { z } from 'zod';
-import { getFirestore, doc, setDoc, addDoc, collection, deleteDoc } from 'firebase/firestore';
+import { doc, setDoc, addDoc, collection, deleteDoc } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
-
-const firestore = getFirestore();
+import { adminDb } from '@/firebase/server';
 
 const AccommodationSchema = z.object({
   id: z.string().optional(),
@@ -57,11 +56,11 @@ export async function saveAccommodation(
   try {
     if (id) {
       // Update existing document
-      const accommodationRef = doc(firestore, 'accommodations', id);
-      await setDoc(accommodationRef, { ...data, amenities: amenitiesArray }, { merge: true });
+      const accommodationRef = adminDb.collection('accommodations').doc(id);
+      await accommodationRef.set({ ...data, amenities: amenitiesArray }, { merge: true });
     } else {
       // Create new document
-      await addDoc(collection(firestore, 'accommodations'), {
+      await adminDb.collection('accommodations').add({
         ...data,
         amenities: amenitiesArray,
         // Add default values for new fields
@@ -93,7 +92,7 @@ export async function deleteAccommodation(id: string): Promise<{ success: boolea
         return { success: false, message: 'Accommodation ID is required.' };
     }
     try {
-        await deleteDoc(doc(firestore, 'accommodations', id));
+        await adminDb.collection('accommodations').doc(id).delete();
         revalidatePath('/admin/accommodations');
         revalidatePath('/accommodations');
         return { success: true, message: 'Accommodation deleted successfully.' };
@@ -102,5 +101,3 @@ export async function deleteAccommodation(id: string): Promise<{ success: boolea
         return { success: false, message: 'Failed to delete accommodation.' };
     }
 }
-
-    
