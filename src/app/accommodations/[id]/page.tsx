@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { useAccommodationById, useReviewsByItemId } from '@/lib/data';
+import { useAccommodationById, useReviewsByItemId, getAccommodationById } from '@/lib/data';
 import { getPlaceholderImage } from '@/lib/utils';
 import {
   Carousel,
@@ -77,9 +77,15 @@ export default function AccommodationDetailPage({
   params: { id: string };
 }) {
   const { user } = useUser();
-  const { data: accommodation, isLoading: isAccommodationLoading } = useAccommodationById(params.id);
+  const { data: firestoreAccommodation, isLoading: isAccommodationLoading } = useAccommodationById(params.id);
   const { data: reviews, isLoading: areReviewsLoading } = useReviewsByItemId(params.id);
 
+  // Fallback to mock data if Firestore data is not available
+  const mockAccommodation = !firestoreAccommodation && !isAccommodationLoading 
+    ? getAccommodationById(params.id) 
+    : null;
+  
+  const accommodation = firestoreAccommodation || mockAccommodation;
 
   if (isAccommodationLoading) {
     return <AccommodationDetailSkeleton />;
